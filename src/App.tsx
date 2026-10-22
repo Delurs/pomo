@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from "./lib/supabaseClient";
 import type { Task } from "./types/pomo";
 import Header from "./components/Header";
 import TimerCard from "./components/TimerCard";
@@ -7,6 +8,7 @@ import MusicPlayerCard from "./components/MusicPlayerCard";
 import NewTaskModal from "./components/NewTaskModal";
 import ProfileModal from "./components/ProfileModal";
 import LoginPage from "./components/LoginPage";
+import ResetPasswordPage from "./components/ResetPasswordPage";
 
 export default function App() {
   // 1. Clean Blank States (No pre-populated dummy data!)
@@ -20,13 +22,18 @@ export default function App() {
     }
   }, [isDark]);
 
-  // Auth State
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+  // AUTH STATE
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [_userName, setUserName] = useState<string>("Mindful Sprout");
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState<boolean>(() => {
     return (
-      localStorage.getItem("pomo_is_logged_in") === "true" ||
-      sessionStorage.getItem("pomo_is_logged_in") === "true"
+      window.location.hash.includes("type=recovery") ||
+      window.location.hash.includes("reset-password")
     );
   });
+
+  // APP STATES
   const [totalSessions, setTotalSessions] = useState<number>(0);
   const [taskCompletedSessions, setTaskCompletedSessions] = useState<number>(0);
   const [targetSessions, setTargetSessions] = useState<number>(1);
@@ -40,17 +47,57 @@ export default function App() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
 
-  const handleLogin = (name: string) => {
-    if (name.trim()) {
-      localStorage.setItem("pomo_user_name", name.trim());
-    }
+  // 2. CHECK SUPABASE SESSION ON LOAD
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setIsAuthenticated(true);
+        setUserId(session.user.id);
+        const name = session.user.user_metadata?.username || "Mindful Sprout";
+        setUserName(name);
+        localStorage.setItem("pomo_user_name", name);
+        localStorage.setItem("pomo_user_id", session.user.id);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setIsPasswordRecovery(true);
+      }
+      if (session) {
+        setIsAuthenticated(true);
+        setUserId(session.user.id);
+        const name = session.user.user_metadata?.username || "Mindful Sprout";
+        setUserName(name);
+        localStorage.setItem("pomo_user_name", name);
+        localStorage.setItem("pomo_user_id", session.user.id);
+      } else {
+        setIsAuthenticated(false);
+        setUserId(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = (name: string, id: string) => {
+    setUserName(name);
+    setUserId(id);
+    localStorage.setItem("pomo_user_name", name);
+    localStorage.setItem("pomo_user_id", id);
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (userId !== "guest") {
+      await supabase.auth.signOut();
+    }
     localStorage.removeItem("pomo_is_logged_in");
     sessionStorage.removeItem("pomo_is_logged_in");
     setIsAuthenticated(false);
+    setUserId(null);
     setIsProfileOpen(false);
   };
 
@@ -167,6 +214,23 @@ export default function App() {
   };
 
   const activeTask = tasks.find((t) => t.id === activeTaskId);
+
+  if (isPasswordRecovery) {
+    return (
+      <ResetPasswordPage
+        isDark={isDark}
+        setIsDark={setIsDark}
+        onComplete={() => {
+          setIsPasswordRecovery(false);
+          window.history.replaceState(null, "", window.location.pathname);
+        }}
+        onLater={() => {
+          setIsPasswordRecovery(false);
+          window.history.replaceState(null, "", window.location.pathname);
+        }}
+      />
+    );
+  }
 
   if (!isAuthenticated) {
     return (

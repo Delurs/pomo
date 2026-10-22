@@ -1,156 +1,133 @@
 import { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 export interface LoginPageProps {
   isDark: boolean;
   setIsDark: (val: boolean) => void;
-  onLogin: (userName: string) => void;
+  onLogin: (userName: string, userId: string) => void;
 }
 
-// Professional RFC 5322 compliant email validator
 const validateEmail = (emailStr: string): { isValid: boolean; error?: string } => {
   const trimmed = emailStr.trim();
-  if (!trimmed) {
-    return { isValid: false, error: "Please enter your email address." };
-  }
+  if (!trimmed) return { isValid: false, error: "Please enter your email address." };
   const emailRegex =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-  if (!emailRegex.test(trimmed)) {
-    return { isValid: false, error: "Please enter a valid email address (e.g. name@domain.com)." };
-  }
-  const parts = trimmed.split("@");
-  if (parts.length !== 2) {
-    return { isValid: false, error: "Email must contain exactly one '@' symbol." };
-  }
-  const [local, domain] = parts;
-  if (local.length > 64) {
-    return { isValid: false, error: "Email prefix cannot exceed 64 characters." };
-  }
-  if (!domain.includes(".")) {
-    return { isValid: false, error: "Email domain must include a valid top-level domain (e.g. .com)." };
-  }
-  const domainParts = domain.split(".");
-  const tld = domainParts[domainParts.length - 1];
-  if (tld.length < 2) {
-    return { isValid: false, error: "Email domain extension is incomplete." };
-  }
+  if (!emailRegex.test(trimmed)) return { isValid: false, error: "Please enter a valid email address." };
   return { isValid: true };
 };
 
 export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps) {
   const [mode, setMode] = useState<"signin" | "register" | "forgot">("signin");
-  const [username, setUsername] = useState<string>(() => localStorage.getItem("pomo_user_name") || "");
-  const [email, setEmail] = useState<string>(() => localStorage.getItem("pomo_user_email") || "");
+  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [rememberMe, setRememberMe] = useState<boolean>(
-    () => localStorage.getItem("pomo_remember_me") === "true"
-  );
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Forgot password specific fields
+  // Forgot password field
   const [forgotEmail, setForgotEmail] = useState<string>("");
-  const [forgotNewPassword, setForgotNewPassword] = useState<string>("");
-  const [forgotConfirmPassword, setForgotConfirmPassword] = useState<string>("");
 
   const resetMessages = () => {
     setErrorMsg("");
     setSuccessMsg("");
   };
 
-  const persistSession = () => {
-    if (rememberMe) {
-      localStorage.setItem("pomo_is_logged_in", "true");
-      localStorage.setItem("pomo_remember_me", "true");
-    } else {
-      localStorage.removeItem("pomo_remember_me");
-      sessionStorage.setItem("pomo_is_logged_in", "true");
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     resetMessages();
+    setIsLoading(true);
 
-    const trimmedUser = username.trim();
     const trimmedEmail = email.trim().toLowerCase();
 
-    if (mode === "signin") {
-      if (!trimmedUser) return setErrorMsg("Please enter your username.");
-      if (!password) return setErrorMsg("Please enter your password.");
+    try {
+      if (mode === "signin") {
+        if (!trimmedEmail || !password) {
+          throw new Error("Please enter both email and password.");
+        }
 
-      const savedPass = localStorage.getItem("pomo_user_password");
-      if (savedPass && savedPass !== password) {
-        return setErrorMsg("Incorrect password. Try again or click 'Forgot password?'.");
+        // SUPABASE SIGN IN
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: trimmedEmail,
+          password: password,
+        });
+
+        if (error) throw error;
+
+        // Pass the user's metadata (username) and ID back to App.tsx
+        onLogin(data.user.user_metadata?.username || "Mindful Sprout", data.user.id);
+      } else if (mode === "register") {
+        const trimmedUser = username.trim();
+        if (!trimmedUser || trimmedUser.length < 2) {
+          throw new Error("Username must be at least 2 characters.");
+        }
+
+        const emailCheck = validateEmail(trimmedEmail);
+        if (!emailCheck.isValid) throw new Error(emailCheck.error);
+
+        if (password.length < 6) throw new Error("Password must be at least 6 characters.");
+        if (password !== confirmPassword) throw new Error("Passwords do not match.");
+
+        // SUPABASE SIGN UP
+        const { data, error } = await supabase.auth.signUp({
+          email: trimmedEmail,
+          password: password,
+          options: {
+            data: { username: trimmedUser },
+          },
+        });
+
+        if (error) throw error;
+
+        if (data.user) {
+          const newUserId = data.user.id;
+          if (data.session) {
+            setSuccessMsg("Account successfully created! Entering your sanctuary...");
+            setTimeout(() => onLogin(trimmedUser, newUserId), 800);
+          } else {
+            // Attempt immediate login without requiring email confirmation
+            const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+              email: trimmedEmail,
+              password: password,
+            });
+            if (!signInErr && signInData?.user) {
+              const loggedInId = signInData.user.id;
+              setSuccessMsg("Account created! Entering your sanctuary...");
+              setTimeout(() => onLogin(trimmedUser, loggedInId), 800);
+            } else {
+              setSuccessMsg("Account created! You can now sign in.");
+              setTimeout(() => setMode("signin"), 1500);
+            }
+          }
+        }
+      } else if (mode === "forgot") {
+        const targetEmail = forgotEmail.trim().toLowerCase();
+        const emailCheck = validateEmail(targetEmail);
+        if (!emailCheck.isValid) throw new Error(emailCheck.error);
+
+        // SUPABASE PASSWORD RESET EMAIL (Redirects user to recovery page when clicked)
+        const redirectUrl = `${window.location.origin}/#reset-password`;
+        const { error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
+          redirectTo: redirectUrl,
+        });
+        if (error) throw error;
+
+        setSuccessMsg("If an account exists, a password reset link has been sent to that email.");
+        setTimeout(() => setMode("signin"), 3500);
       }
-
-      persistSession();
-      localStorage.setItem("pomo_user_name", trimmedUser);
-      onLogin(trimmedUser);
-    } else if (mode === "register") {
-      if (!trimmedUser) return setErrorMsg("Please enter a username.");
-      if (!trimmedUser.length || trimmedUser.length < 2) {
-        return setErrorMsg("Username must be at least 2 characters.");
-      }
-
-      const emailCheck = validateEmail(trimmedEmail);
-      if (!emailCheck.isValid) {
-        return setErrorMsg(emailCheck.error || "Please enter a valid email address.");
-      }
-
-      if (!password) return setErrorMsg("Please create a password.");
-      if (password.length < 6) return setErrorMsg("Password must be at least 6 characters.");
-      if (password !== confirmPassword) return setErrorMsg("Passwords do not match.");
-
-      localStorage.setItem("pomo_user_name", trimmedUser);
-      localStorage.setItem("pomo_user_email", trimmedEmail);
-      localStorage.setItem("pomo_user_password", password);
-      persistSession();
-
-      setSuccessMsg("Account successfully created! Welcome to Pomodoro Tortoise.");
-      setTimeout(() => onLogin(trimmedUser), 700);
-    } else {
-      const targetEmail = forgotEmail.trim().toLowerCase();
-      const emailCheck = validateEmail(targetEmail);
-      if (!emailCheck.isValid) {
-        return setErrorMsg(emailCheck.error || "Please enter a valid registered email.");
-      }
-
-      const savedEmail = localStorage.getItem("pomo_user_email");
-      if (savedEmail && savedEmail.toLowerCase() !== targetEmail) {
-        return setErrorMsg("No account found with this email address. Please verify your email.");
-      }
-
-      if (!forgotNewPassword) {
-        return setErrorMsg("Please enter your new password.");
-      }
-      if (forgotNewPassword.length < 6) {
-        return setErrorMsg("New password must be at least 6 characters.");
-      }
-      if (forgotNewPassword !== forgotConfirmPassword) {
-        return setErrorMsg("Passwords do not match.");
-      }
-
-      localStorage.setItem("pomo_user_password", forgotNewPassword);
-      if (!savedEmail) {
-        localStorage.setItem("pomo_user_email", targetEmail);
-      }
-
-      setSuccessMsg("Password successfully changed! Redirecting to Sign In...");
-      setPassword(forgotNewPassword);
-      setTimeout(() => {
-        setMode("signin");
-        setSuccessMsg("");
-      }, 1300);
+    } catch (err: any) {
+      setErrorMsg(err.message || "An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleQuickDemo = () => {
-    const demoUser = "Mindful Sprout";
-    localStorage.setItem("pomo_user_name", demoUser);
-    localStorage.setItem("pomo_is_logged_in", "true");
-    onLogin(demoUser);
+    // Guest Mode falls back to local storage
+    localStorage.setItem("pomo_user_name", "Mindful Guest");
+    onLogin("Mindful Guest", "guest");
   };
 
   const inputClass = `w-full h-9 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] transition ${
@@ -158,7 +135,8 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
       ? "bg-[#161b1a] border-white/10 text-white placeholder-white/30"
       : "bg-white border-black/10 text-black placeholder-black/30"
   }`;
-  const inputIconClass = "w-4 h-4 object-contain absolute left-3 top-1/2 -translate-y-1/2 opacity-60 pointer-events-none";
+  const inputIconClass =
+    "w-4 h-4 object-contain absolute left-3 top-1/2 -translate-y-1/2 opacity-60 pointer-events-none";
   const labelClass = "block text-[11px] font-semibold opacity-75 mb-0.5";
 
   return (
@@ -193,7 +171,7 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
         </span>
       </button>
 
-      {/* LEFT: Brand showcase (big logo, steady without fade/pulse animation) */}
+      {/* LEFT: Brand showcase */}
       <section
         className={`hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden ${
           isDark
@@ -239,7 +217,7 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
         </div>
       </section>
 
-      {/* RIGHT: Login card (compact, no vertical scrolling) */}
+      {/* RIGHT: Login card */}
       <main className="w-full lg:w-1/2 h-full flex items-center justify-center px-4 py-3 relative z-10">
         <div
           className={`w-full max-w-md rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all ${
@@ -256,12 +234,12 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
             <h2 className="text-lg sm:text-xl font-bold tracking-tight">
               {mode === "signin" && "Welcome Back"}
               {mode === "register" && "Create an Account"}
-              {mode === "forgot" && "Change Password"}
+              {mode === "forgot" && "Reset Password"}
             </h2>
             <p className="text-[11px] opacity-60 mt-0.5">
               {mode === "signin" && "Enter your credentials to enter your focus sanctuary"}
               {mode === "register" && "Begin your calm and steady productivity journey"}
-              {mode === "forgot" && "Verify your registered email to set a new password"}
+              {mode === "forgot" && "Enter your email to receive a secure password reset link"}
             </p>
           </div>
 
@@ -312,13 +290,13 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
           <form onSubmit={handleSubmit} className="space-y-2.5">
             {mode === "forgot" ? (
               <>
-                {/* Registered Email Verification */}
                 <div>
                   <label className={labelClass}>Registered Email Address</label>
                   <div className="relative">
                     <img src="/mail.png" alt="Email" className={inputIconClass} />
                     <input
                       type="email"
+                      required
                       autoFocus
                       placeholder="e.g. yourname@example.com"
                       value={forgotEmail}
@@ -327,49 +305,6 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
                     />
                   </div>
                 </div>
-
-                {/* New Password */}
-                <div>
-                  <label className={labelClass}>New Password</label>
-                  <div className="relative">
-                    <img src="/lock.png" alt="Password" className={inputIconClass} />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="At least 6 characters"
-                      value={forgotNewPassword}
-                      onChange={(e) => setForgotNewPassword(e.target.value)}
-                      className={`${inputClass} pl-9 pr-9`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100 transition cursor-pointer p-0.5"
-                      title={showPassword ? "Hide password" : "Show password"}
-                    >
-                      <img
-                        src={showPassword ? "/password_visibility.png" : "/password_invisibility.png"}
-                        alt={showPassword ? "Hide password" : "Show password"}
-                        className="w-4 h-4 object-contain"
-                      />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Confirm New Password */}
-                <div>
-                  <label className={labelClass}>Confirm New Password</label>
-                  <div className="relative">
-                    <img src="/lock_reset.png" alt="Confirm Password" className={inputIconClass} />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Re-enter new password"
-                      value={forgotConfirmPassword}
-                      onChange={(e) => setForgotConfirmPassword(e.target.value)}
-                      className={`${inputClass} pl-9 pr-3`}
-                    />
-                  </div>
-                </div>
-
                 <div className="pt-1 flex items-center gap-2">
                   <button
                     type="button"
@@ -387,55 +322,56 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2 rounded-xl bg-[#adf1dc] text-[#002019] text-xs font-bold hover:scale-[1.01] active:scale-[0.99] transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                    disabled={isLoading}
+                    className="flex-1 py-2 rounded-xl bg-[#adf1dc] text-[#002019] text-xs font-bold hover:scale-[1.01] active:scale-[0.99] transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-60"
                   >
-                    <img src="/lock_reset.png" alt="Save Password" className="w-4 h-4 object-contain inline-block" />
-                    <span>Save Password</span>
+                    <span>{isLoading ? "Sending..." : "Send Reset Link"}</span>
                   </button>
                 </div>
               </>
             ) : (
               <>
-                {/* Username */}
-                <div>
-                  <label className={labelClass}>Username</label>
-                  <div className="relative">
-                    <img src="/person.png" alt="Username" className={inputIconClass} />
-                    <input
-                      type="text"
-                      autoFocus
-                      placeholder="Enter username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className={`${inputClass} pl-9 pr-3`}
-                    />
-                  </div>
-                </div>
-
-                {/* Email Input (in Register mode) */}
                 {mode === "register" && (
                   <div>
-                    <label className={labelClass}>Email Address</label>
+                    <label className={labelClass}>Username</label>
                     <div className="relative">
-                      <img src="/mail.png" alt="Email" className={inputIconClass} />
+                      <img src="/person.png" alt="Username" className={inputIconClass} />
                       <input
-                        type="email"
-                        placeholder="e.g. name@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        type="text"
+                        required
+                        autoFocus
+                        placeholder="Enter username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         className={`${inputClass} pl-9 pr-3`}
                       />
                     </div>
                   </div>
                 )}
 
-                {/* Password Input */}
+                <div>
+                  <label className={labelClass}>Email Address</label>
+                  <div className="relative">
+                    <img src="/mail.png" alt="Email" className={inputIconClass} />
+                    <input
+                      type="email"
+                      required
+                      autoFocus={mode === "signin"}
+                      placeholder="e.g. name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className={`${inputClass} pl-9 pr-3`}
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className={labelClass}>Password</label>
                   <div className="relative">
                     <img src="/lock.png" alt="Password" className={inputIconClass} />
                     <input
                       type={showPassword ? "text" : "password"}
+                      required
                       placeholder={mode === "signin" ? "Enter your password" : "At least 6 characters"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -456,7 +392,6 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
                   </div>
                 </div>
 
-                {/* Confirm Password (Register mode) */}
                 {mode === "register" && (
                   <div>
                     <label className={labelClass}>Confirm Password</label>
@@ -464,6 +399,7 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
                       <img src="/lock_reset.png" alt="Confirm Password" className={inputIconClass} />
                       <input
                         type={showPassword ? "text" : "password"}
+                        required
                         placeholder="Re-enter password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
@@ -473,18 +409,8 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
                   </div>
                 )}
 
-                {/* Remember Me & Forgot Password Row (Sign In mode) */}
                 {mode === "signin" && (
-                  <div className="flex items-center justify-between text-xs pt-0.5">
-                    <label className="flex items-center gap-1.5 cursor-pointer select-none opacity-80 hover:opacity-100 transition">
-                      <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-3.5 h-3.5 rounded accent-[#256959] cursor-pointer"
-                      />
-                      <span className="text-[11px]">Remember me</span>
-                    </label>
+                  <div className="flex items-center justify-end text-xs pt-0.5">
                     <button
                       type="button"
                       onClick={() => {
@@ -498,23 +424,28 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
                   </div>
                 )}
 
-                {/* Action Button */}
                 <button
                   type="submit"
-                  className="w-full mt-1 py-2 rounded-xl bg-[#adf1dc] text-[#002019] text-xs sm:text-sm font-bold hover:scale-[1.01] active:scale-[0.99] transition cursor-pointer shadow-md flex items-center justify-center gap-2"
+                  disabled={isLoading}
+                  className="w-full mt-1 py-2 rounded-xl bg-[#adf1dc] text-[#002019] text-xs sm:text-sm font-bold hover:scale-[1.01] active:scale-[0.99] transition cursor-pointer shadow-md flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   <img
                     src={mode === "signin" ? "/login.png" : "/how_to_reg.png"}
                     alt={mode === "signin" ? "Login" : "Register"}
                     className="w-4 h-4 object-contain inline-block"
                   />
-                  <span>{mode === "signin" ? "Login" : "Create Account"}</span>
+                  <span>
+                    {isLoading
+                      ? "Processing..."
+                      : mode === "signin"
+                      ? "Login"
+                      : "Create Account"}
+                  </span>
                 </button>
               </>
             )}
           </form>
 
-          {/* Quick Demo Access Button */}
           {mode !== "forgot" && (
             <div className="mt-2.5 pt-2.5 border-t border-black/5 dark:border-white/5 text-center">
               <button
