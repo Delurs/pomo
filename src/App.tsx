@@ -6,6 +6,7 @@ import TaskListCard from "./components/TaskListCard";
 import MusicPlayerCard from "./components/MusicPlayerCard";
 import NewTaskModal from "./components/NewTaskModal";
 import ProfileModal from "./components/ProfileModal";
+import LoginPage from "./components/LoginPage";
 
 export default function App() {
   // 1. Clean Blank States (No pre-populated dummy data!)
@@ -18,6 +19,14 @@ export default function App() {
       document.documentElement.classList.remove("dark");
     }
   }, [isDark]);
+
+  // Auth State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return (
+      localStorage.getItem("pomo_is_logged_in") === "true" ||
+      sessionStorage.getItem("pomo_is_logged_in") === "true"
+    );
+  });
   const [totalSessions, setTotalSessions] = useState<number>(0);
   const [taskCompletedSessions, setTaskCompletedSessions] = useState<number>(0);
   const [targetSessions, setTargetSessions] = useState<number>(1);
@@ -30,6 +39,20 @@ export default function App() {
   const [modalInitialTitle, setModalInitialTitle] = useState<string>("");
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+
+  const handleLogin = (name: string) => {
+    if (name.trim()) {
+      localStorage.setItem("pomo_user_name", name.trim());
+    }
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("pomo_is_logged_in");
+    sessionStorage.removeItem("pomo_is_logged_in");
+    setIsAuthenticated(false);
+    setIsProfileOpen(false);
+  };
 
   // 2. Task Handlers
   const handleOpenTaskModal = (initialTitle: string = "") => {
@@ -145,6 +168,16 @@ export default function App() {
 
   const activeTask = tasks.find((t) => t.id === activeTaskId);
 
+  if (!isAuthenticated) {
+    return (
+      <LoginPage
+        isDark={isDark}
+        setIsDark={setIsDark}
+        onLogin={handleLogin}
+      />
+    );
+  }
+
   return (
     <div
       className={`min-h-screen flex flex-col justify-between transition-colors duration-300 ${isDark ? "bg-[#141e19] text-[#e8f3ec]" : "bg-[#f1fcf4] text-[#141e19]"
@@ -224,6 +257,7 @@ export default function App() {
           onClose={() => setIsProfileOpen(false)}
           tasks={tasks}
           completedSessions={totalSessions}
+          onLogout={handleLogout}
         />
       )}
 

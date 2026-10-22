@@ -8,7 +8,7 @@ interface HeaderProps {
 export default function Header({
     isDark,
     setIsDark,
-    completedSessions,
+    completedSessions: _completedSessions,
     onOpenProfile,
 }: HeaderProps) {
     return (

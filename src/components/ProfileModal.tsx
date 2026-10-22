@@ -7,6 +7,7 @@ export interface ProfileModalProps {
   onClose: () => void;
   tasks: Task[];
   completedSessions?: number;
+  onLogout?: () => void;
 }
 
 type TimeFilter = "day" | "week" | "month";
@@ -31,6 +32,7 @@ export default function ProfileModal({
   isOpen,
   onClose,
   tasks,
+  onLogout,
 }: ProfileModalProps) {
   // 1. Profile State
   const [userName, setUserName] = useState<string>(() => {
@@ -47,6 +49,7 @@ export default function ProfileModal({
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // 3. Overview Time Filter State
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("month");
@@ -119,6 +122,14 @@ export default function ProfileModal({
       setPasswordFeedback({ type: null, message: "" });
       setIsChangingPassword(false);
     }, 2000);
+  };
+
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    } else {
+      onClose();
+    }
   };
 
   // Safe category meta resolver in case of historical tasks
@@ -320,74 +331,140 @@ export default function ProfileModal({
           </button>
         </div>
 
-        {/* Profile Card & Account Security Centered */}
+        {/* Profile Card & Account Security */}
         <div
-          className={`rounded-2xl p-6 border mb-6 flex flex-col items-center justify-center text-center ${
+          className={`rounded-2xl p-6 border mb-6 transition-all ${
             isDark ? "bg-[#161b1a] border-white/5" : "bg-[#f1fcf4] border-black/5"
           }`}
         >
-          {/* Avatar Centered */}
-          <div className="w-16 h-16 rounded-2xl bg-[#adf1dc] text-[#002019] flex items-center justify-center font-bold shadow-sm mb-3 p-2.5">
-            <img src="/profile.png" alt="Profile" className="w-full h-full object-contain" />
-          </div>
-
-          {/* Username & Edit Centered */}
-          <div className="flex flex-col items-center justify-center mb-1">
-            {isEditingName ? (
-              <div className="flex items-center justify-center gap-2">
-                <input
-                  type="text"
-                  value={tempName}
-                  onChange={(e) => setTempName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
-                  autoFocus
-                  className={`px-3 py-1 text-sm font-bold rounded-lg border focus:outline-none text-center w-40 ${
-                    isDark
-                      ? "bg-[#1f2725] border-white/20 text-white"
-                      : "bg-white border-black/20 text-black"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={handleSaveName}
-                  className="px-3 py-1 rounded-lg text-xs font-semibold bg-[#adf1dc] text-[#002019] cursor-pointer hover:opacity-90 flex-shrink-0"
-                >
-                  Save
-                </button>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            {/* User Info (Left side on maximized / Centered on minimized) */}
+            <div className="flex flex-col sm:flex-row items-center gap-3.5">
+              {/* Avatar */}
+              <div className="w-16 h-16 rounded-2xl bg-[#adf1dc] text-[#002019] flex items-center justify-center font-bold shadow-sm p-2.5 flex-shrink-0">
+                <img src="/profile.png" alt="Profile" className="w-full h-full object-contain" />
               </div>
-            ) : (
-              <div className="flex items-center justify-center gap-2">
-                <h4 className="text-lg font-bold">{userName}</h4>
+
+              {/* Username & Subtitle */}
+              <div className="flex flex-col items-center sm:items-start justify-center">
+                {isEditingName ? (
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <input
+                      type="text"
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+                      autoFocus
+                      className={`px-3 py-1 text-sm font-bold rounded-lg border focus:outline-none text-center sm:text-left w-40 ${
+                        isDark
+                          ? "bg-[#1f2725] border-white/20 text-white"
+                          : "bg-white border-black/20 text-black"
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSaveName}
+                      className="px-3 py-1 rounded-lg text-xs font-semibold bg-[#adf1dc] text-[#002019] cursor-pointer hover:opacity-90 flex-shrink-0"
+                    >
+                      Save
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <h4 className="text-lg font-bold">{userName}</h4>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempName(userName);
+                        setIsEditingName(true);
+                      }}
+                      className="opacity-50 hover:opacity-100 transition cursor-pointer p-0.5"
+                      title="Edit name"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">edit</span>
+                    </button>
+                  </div>
+                )}
+                <p className="text-xs opacity-50 mt-0.5">Mindful Practitioner</p>
+              </div>
+            </div>
+
+            {/* Actions: Change Password & Log out (Right side on maximized / Centered on minimized) */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2.5 mt-2 sm:mt-0">
+              {!isChangingPassword && (
                 <button
                   type="button"
                   onClick={() => {
-                    setTempName(userName);
-                    setIsEditingName(true);
+                    setIsChangingPassword(true);
+                    setPasswordFeedback({ type: null, message: "" });
                   }}
-                  className="opacity-50 hover:opacity-100 transition cursor-pointer p-0.5"
-                  title="Edit name"
+                  className="px-4 py-1.5 rounded-full bg-[#adf1dc] text-[#002019] text-xs font-bold hover:scale-105 active:scale-95 transition cursor-pointer shadow-xs flex items-center gap-1.5"
                 >
-                  <span className="material-symbols-outlined text-[16px]">edit</span>
+                  <img src="/lock_reset.png" alt="Lock Reset" className="w-4 h-4 object-contain inline-block" />
+                  <span>Change Password</span>
                 </button>
-              </div>
-            )}
-            <p className="text-xs opacity-50 mt-0.5">Mindful Practitioner</p>
-          </div>
+              )}
 
-          {/* Clean Account Security Button Centered */}
-          {!isChangingPassword && (
-            <div className="flex items-center justify-center mt-3">
+              {/* Log out Button - Red Palette */}
               <button
                 type="button"
-                onClick={() => {
-                  setIsChangingPassword(true);
-                  setPasswordFeedback({ type: null, message: "" });
-                }}
-                className="px-4 py-1.5 rounded-full bg-[#adf1dc] text-[#002019] text-xs font-bold hover:scale-105 active:scale-95 transition cursor-pointer shadow-xs flex items-center gap-1.5"
+                onClick={() => setShowLogoutConfirm(true)}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold transition cursor-pointer shadow-xs flex items-center gap-1.5 hover:scale-105 active:scale-95 ${
+                  isDark
+                    ? "bg-red-500/15 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20"
+                    : "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-200"
+                }`}
+                title="Log out"
               >
-                <img src="/lock_reset.png" alt="Lock Reset" className="w-4 h-4 object-contain inline-block" />
-                <span>Change Password</span>
+                <img src="/logout.png" alt="Log out" className="w-4 h-4 object-contain inline-block" />
+                <span>Log out</span>
               </button>
+            </div>
+          </div>
+
+          {/* Logout Validation Modal */}
+          {showLogoutConfirm && (
+            <div
+              className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+              onClick={() => setShowLogoutConfirm(false)}
+            >
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className={`p-6 rounded-3xl border shadow-2xl max-w-sm w-full text-center transition-all animate-in zoom-in-95 duration-150 ${
+                  isDark
+                    ? "bg-[#1f2725] border-white/10 text-[#e8f3ec]"
+                    : "bg-white border-black/10 text-[#141e19]"
+                }`}
+              >
+                <div className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center bg-red-500/15 text-red-500">
+                  <img src="/logout.png" alt="Log out" className="w-6 h-6 object-contain" />
+                </div>
+                <h4 className="text-base font-bold mb-1">Confirm Log Out</h4>
+                <p className="text-sm opacity-80 mb-5">Are you sure you want to log out?</p>
+                <div className="flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowLogoutConfirm(false)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-semibold border transition cursor-pointer hover:opacity-90 ${
+                      isDark
+                        ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                        : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10"
+                    }`}
+                  >
+                    No
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowLogoutConfirm(false);
+                      handleLogout();
+                    }}
+                    className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-red-500 hover:bg-red-600 text-white shadow-sm transition cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Yes
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
