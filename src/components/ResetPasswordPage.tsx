@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 export interface ResetPasswordPageProps {
@@ -21,6 +21,37 @@ export default function ResetPasswordPage({
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Automatically read recovery tokens from URL on mount
+  useEffect(() => {
+    async function initRecovery() {
+      // 1. If tokens are in hash: #access_token=...&refresh_token=...
+      const hash = window.location.hash;
+      if (hash && hash.includes("access_token=")) {
+        const cleanHash = hash.startsWith("#") ? hash.substring(1) : hash;
+        const params = new URLSearchParams(cleanHash);
+        const access_token = params.get("access_token");
+        const refresh_token = params.get("refresh_token");
+
+        if (access_token && refresh_token) {
+          await supabase.auth.setSession({
+            access_token,
+            refresh_token,
+          });
+          return;
+        }
+      }
+
+      // 2. If PKCE code is in query params: ?code=...
+      const searchParams = new URLSearchParams(window.location.search);
+      const code = searchParams.get("code");
+      if (code) {
+        await supabase.auth.exchangeCodeForSession(code).catch(() => { });
+      }
+    }
+
+    initRecovery();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,55 +78,54 @@ export default function ResetPasswordPage({
         password: newPassword,
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
-      setSuccessMsg("Password successfully updated! Redirecting to your sanctuary...");
+      setSuccessMsg("Password successfully updated! Entering your workplace...");
       setTimeout(() => {
         onComplete();
       }, 1500);
     } catch (err: any) {
-      setErrorMsg(err.message || "Failed to update password. Please try again.");
+      setErrorMsg(
+        err.message || "Failed to update password. Please request a new link."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const inputClass = `w-full h-9 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] transition ${
-    isDark
-      ? "bg-[#161b1a] border-white/10 text-white placeholder-white/30"
-      : "bg-white border-black/10 text-black placeholder-black/30"
-  }`;
+  const inputClass = `w-full h-9 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] transition ${isDark
+    ? "bg-[#161b1a] border-white/10 text-white placeholder-white/30"
+    : "bg-white border-black/10 text-black placeholder-black/30"
+    }`;
   const inputIconClass =
     "w-4 h-4 object-contain absolute left-3 top-1/2 -translate-y-1/2 opacity-60 pointer-events-none";
   const labelClass = "block text-[11px] font-semibold opacity-75 mb-0.5";
 
   return (
     <div
-      className={`h-screen w-full overflow-hidden flex relative transition-colors duration-300 ${
-        isDark ? "bg-[#141e19] text-[#e8f3ec]" : "bg-[#f1fcf4] text-[#141e19]"
-      }`}
+      className={`h-screen w-full overflow-hidden flex relative transition-colors duration-300 ${isDark ? "bg-[#141e19] text-[#e8f3ec]" : "bg-[#f1fcf4] text-[#141e19]"
+        }`}
     >
       {/* Theme Toggle (top-right) */}
       <button
         onClick={() => setIsDark(!isDark)}
         aria-label="Toggle Light and Dark Mode"
-        className={`absolute top-4 right-4 sm:right-6 z-20 p-1 rounded-full border transition flex items-center cursor-pointer ${
-          isDark
-            ? "bg-[#1f2725] border-white/10 text-[#adf1dc]"
-            : "bg-white border-black/5 text-[#256959] shadow-sm"
-        }`}
+        className={`absolute top-4 right-4 sm:right-6 z-20 p-1 rounded-full border transition flex items-center cursor-pointer ${isDark
+          ? "bg-[#1f2725] border-white/10 text-[#adf1dc]"
+          : "bg-white border-black/5 text-[#256959] shadow-sm"
+          }`}
       >
         <span
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${
-            !isDark ? "bg-[#adf1dc] text-[#002019]" : "opacity-40"
-          }`}
+          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${!isDark ? "bg-[#adf1dc] text-[#002019]" : "opacity-40"
+            }`}
         >
           <img src="/light_mode.png" alt="Light mode" className="w-4 h-4 object-contain" />
         </span>
         <span
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${
-            isDark ? "bg-[#256959] text-white" : "opacity-40"
-          }`}
+          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${isDark ? "bg-[#256959] text-white" : "opacity-40"
+            }`}
         >
           <img src="/dark_mode.png" alt="Dark mode" className="w-4 h-4 object-contain" />
         </span>
@@ -103,19 +133,16 @@ export default function ResetPasswordPage({
 
       {/* LEFT: Brand showcase */}
       <section
-        className={`hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden ${
-          isDark
-            ? "bg-gradient-to-br from-[#1a2a24] via-[#16221d] to-[#0f1814]"
-            : "bg-gradient-to-br from-[#d9f7e8] via-[#c4f0dc] to-[#adf1dc]"
-        }`}
+        className={`hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden ${isDark
+          ? "bg-gradient-to-br from-[#1a2a24] via-[#16221d] to-[#0f1814]"
+          : "bg-gradient-to-br from-[#d9f7e8] via-[#c4f0dc] to-[#adf1dc]"
+          }`}
       >
-        {/* Ambient glows */}
         <div className="absolute -top-32 -left-32 w-[28rem] h-[28rem] rounded-full bg-[#adf1dc]/30 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-40 -right-24 w-[30rem] h-[30rem] rounded-full bg-[#256959]/25 blur-3xl pointer-events-none" />
         <div
-          className={`absolute w-[34rem] h-[34rem] rounded-full border pointer-events-none ${
-            isDark ? "border-white/5" : "border-[#256959]/10"
-          }`}
+          className={`absolute w-[34rem] h-[34rem] rounded-full border pointer-events-none ${isDark ? "border-white/5" : "border-[#256959]/10"
+            }`}
         />
 
         <div className="relative z-10 flex flex-col items-center text-center px-10">
@@ -127,14 +154,12 @@ export default function ResetPasswordPage({
           <img
             src="/logo-name.png"
             alt="Pomodoro Tortoise"
-            className={`h-9 xl:h-12 mt-5 object-contain ${
-              isDark ? "brightness-[2.2] contrast-125" : ""
-            }`}
+            className={`h-9 xl:h-12 mt-5 object-contain ${isDark ? "brightness-[2.2] contrast-125" : ""
+              }`}
           />
           <p
-            className={`mt-3 text-xs xl:text-sm font-medium tracking-wide ${
-              isDark ? "text-[#adf1dc]/80" : "text-[#256959]"
-            }`}
+            className={`mt-3 text-xs xl:text-sm font-medium tracking-wide ${isDark ? "text-[#adf1dc]/80" : "text-[#256959]"
+              }`}
           >
             Slow down. Focus deeply. Grow steadily.
           </p>
@@ -144,13 +169,11 @@ export default function ResetPasswordPage({
       {/* RIGHT: Reset Password Card */}
       <main className="w-full lg:w-1/2 h-full flex items-center justify-center px-4 py-3 relative z-10">
         <div
-          className={`w-full max-w-md rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all ${
-            isDark
-              ? "bg-[#1f2725]/90 border-white/10 text-[#e8f3ec]"
-              : "bg-white/95 border-black/5 text-[#141e19]"
-          }`}
+          className={`w-full max-w-md rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all ${isDark
+            ? "bg-[#1f2725]/90 border-white/10 text-[#e8f3ec]"
+            : "bg-white/95 border-black/5 text-[#141e19]"
+            }`}
         >
-          {/* Avatar & Welcoming Greeting */}
           <div className="text-center mb-4">
             <div className="w-12 h-12 rounded-2xl mx-auto mb-2 bg-[#adf1dc] text-[#002019] flex items-center justify-center font-bold shadow-sm p-2">
               <img src="/lock_reset.png" alt="Lock Reset" className="w-full h-full object-contain" />
@@ -163,7 +186,6 @@ export default function ResetPasswordPage({
             </p>
           </div>
 
-          {/* Feedback alerts */}
           {errorMsg && (
             <div className="mb-3 px-3 py-1.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-500 dark:text-red-400 text-[11px] font-medium flex items-center gap-1.5 animate-in fade-in duration-150">
               <span className="material-symbols-outlined text-[15px] flex-shrink-0">error</span>
@@ -178,7 +200,6 @@ export default function ResetPasswordPage({
           )}
 
           <form onSubmit={handleSubmit} className="space-y-3">
-            {/* New Password */}
             <div>
               <label className={labelClass}>New Password</label>
               <div className="relative">
@@ -207,7 +228,6 @@ export default function ResetPasswordPage({
               </div>
             </div>
 
-            {/* Confirm Password */}
             <div>
               <label className={labelClass}>Confirm Password</label>
               <div className="relative">
@@ -235,16 +255,14 @@ export default function ResetPasswordPage({
               </div>
             </div>
 
-            {/* Action buttons: Change Password & Later */}
             <div className="pt-2 flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={onLater}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-semibold border transition cursor-pointer hover:opacity-90 ${
-                  isDark
-                    ? "border-white/10 hover:bg-white/5 text-slate-300"
-                    : "border-black/10 hover:bg-black/5 text-slate-700"
-                }`}
+                className={`flex-1 py-2.5 rounded-xl text-xs font-semibold border transition cursor-pointer hover:opacity-90 ${isDark
+                  ? "border-white/10 hover:bg-white/5 text-slate-300"
+                  : "border-black/10 hover:bg-black/5 text-slate-700"
+                  }`}
               >
                 Later
               </button>

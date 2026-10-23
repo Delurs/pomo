@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "./lib/supabaseClient";
 import type { Task } from "./types/pomo";
 import Header from "./components/Header";
@@ -11,7 +11,6 @@ import LoginPage from "./components/LoginPage";
 import ResetPasswordPage from "./components/ResetPasswordPage";
 
 export default function App() {
-  // 1. Clean Blank States (No pre-populated dummy data!)
   const [isDark, setIsDark] = useState<boolean>(false);
 
   useEffect(() => {
@@ -47,7 +46,7 @@ export default function App() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
 
-  // 2. CHECK SUPABASE SESSION ON LOAD
+  // 1. SUPABASE SESSION LISTENER
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -76,11 +75,62 @@ export default function App() {
       } else {
         setIsAuthenticated(false);
         setUserId(null);
+        setTasks([]);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // 2. FETCH TASKS ON LOGIN / USER CHANGE
+  const fetchTasks = useCallback(async (uid: string) => {
+    if (uid === "guest") {
+      const saved = localStorage.getItem("pomo_guest_tasks");
+      if (saved) {
+        try {
+          setTasks(JSON.parse(saved));
+        } catch {
+          setTasks([]);
+        }
+      }
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .eq("user_id", uid)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching tasks from Supabase:", error.message);
+      return;
+    }
+
+    if (data) {
+      const formattedTasks: Task[] = data.map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        category: row.category,
+        sprouts: row.sprouts,
+        priority: row.priority,
+        subtasks: Array.isArray(row.subtasks) ? row.subtasks : [],
+        completed: Boolean(row.completed),
+        createdAt: row.created_at,
+        deadline: row.deadline || undefined,
+        reminderDate: row.reminder_date || undefined,
+        reminderTime: row.reminder_time || undefined,
+        notified: Boolean(row.notified),
+      }));
+      setTasks(formattedTasks);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userId) {
+      fetchTasks(userId);
+    }
+  }, [userId, fetchTasks]);
 
   const handleLogin = (name: string, id: string) => {
     setUserName(name);
@@ -98,10 +148,11 @@ export default function App() {
     sessionStorage.removeItem("pomo_is_logged_in");
     setIsAuthenticated(false);
     setUserId(null);
+    setTasks([]);
     setIsProfileOpen(false);
   };
 
-  // 2. Task Handlers
+  // 3. TASK HANDLERS WITH SUPABASE PERSISTENCE
   const handleOpenTaskModal = (initialTitle: string = "") => {
     setEditingTask(null);
     setModalInitialTitle(initialTitle);
@@ -111,6 +162,37 @@ export default function App() {
   const handleEditTask = (task: Task) => {
     setEditingTask(task);
     setIsModalOpen(true);
+  };
+
+  const handleCreateDetailedTask = async (newTask: Task) => {
+    // 1. Optimistic Update (shows immediately)
+    setTasks((prev) => [newTask, ...prev]);
+
+    // 2. Persist to Supabase
+    if (userId && userId !== "guest") {
+      const { error } = await supabase.from("tasks").insert({
+        id: newTask.id,
+        user_id: userId,
+        title: newTask.title,
+        category: newTask.category,
+        sprouts: newTask.sprouts,
+        priority: newTask.priority,
+        subtasks: newTask.subtasks,
+        completed: newTask.completed,
+        created_at: newTask.createdAt,
+        reminder_date: newTask.reminderDate || null,
+        reminder_time: newTask.reminderTime || null,
+      });
+
+      if (error) {
+        console.error("SUPABASE TASK INSERT FAILED:", error.message);
+      }
+    } else {
+      localStorage.setItem(
+        "pomo_guest_tasks",
+        JSON.stringify([newTask, ...tasks])
+      );
+    }
   };
 
   const handleQuickAddTask = (title: string) => {
@@ -124,27 +206,49 @@ export default function App() {
       completed: false,
       createdAt: new Date().toLocaleDateString("en-CA"),
     };
-    setTasks([...tasks, newTask]);
+    handleCreateDetailedTask(newTask);
   };
 
-  const handleCreateDetailedTask = (newTask: Task) => {
-    setTasks([...tasks, newTask]);
-  };
-
-  const handleUpdateTask = (updatedTask: Task) => {
-    setTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+  const handleUpdateTask = async (updatedTask: Task) => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+    );
     if (activeTaskId === updatedTask.id) {
       setTargetSessions(updatedTask.sprouts || 1);
     }
     setEditingTask(null);
+
+    if (userId && userId !== "guest") {
+      const { error } = await supabase
+        .from("tasks")
+        .update({
+          title: updatedTask.title,
+          category: updatedTask.category,
+          sprouts: updatedTask.sprouts,
+          priority: updatedTask.priority,
+          subtasks: updatedTask.subtasks,
+          completed: updatedTask.completed,
+          reminder_date: updatedTask.reminderDate || null,
+          reminder_time: updatedTask.reminderTime || null,
+        })
+        .eq("id", updatedTask.id)
+        .eq("user_id", userId);
+
+      if (error) console.error("SUPABASE TASK UPDATE FAILED:", error.message);
+    } else {
+      localStorage.setItem(
+        "pomo_guest_tasks",
+        JSON.stringify(
+          tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+        )
+      );
+    }
   };
 
   const handleStartTask = (task: Task) => {
     setActiveTaskId(task.id);
-    // Apply assigned sessions from this task to the timer & reset task session progress
     setTargetSessions(task.sprouts || 1);
     setTaskCompletedSessions(0);
-    // Signal TimerCard to reset to Focus and start countdown immediately
     setStartTimerSignal((prev) => prev + 1);
   };
 
@@ -155,27 +259,54 @@ export default function App() {
     setStopTimerSignal((prev) => prev + 1);
   };
 
-  const handleToggleTask = (taskId: string) => {
-    setTasks(
-      tasks.map((t) => {
+  const handleToggleTask = async (taskId: string) => {
+    const target = tasks.find((t) => t.id === taskId);
+    if (!target) return;
+    const newCompleted = !target.completed;
+
+    setTasks((prev) =>
+      prev.map((t) => {
         if (t.id !== taskId) return t;
-        const newCompleted = !t.completed;
-        if (newCompleted && activeTaskId === taskId) {
-          setActiveTaskId(null);
-          setTaskCompletedSessions(0);
-          setTargetSessions(1);
-          setStopTimerSignal((prev) => prev + 1);
-        }
         return { ...t, completed: newCompleted };
       })
     );
+
+    if (newCompleted && activeTaskId === taskId) {
+      setActiveTaskId(null);
+      setTaskCompletedSessions(0);
+      setTargetSessions(1);
+      setStopTimerSignal((prev) => prev + 1);
+    }
+
+    if (userId && userId !== "guest") {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ completed: newCompleted })
+        .eq("id", taskId)
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("SUPABASE TOGGLE COMPLETION FAILED:", error.message);
+      }
+    } else {
+      localStorage.setItem(
+        "pomo_guest_tasks",
+        JSON.stringify(
+          tasks.map((t) =>
+            t.id === taskId ? { ...t, completed: newCompleted } : t
+          )
+        )
+      );
+    }
   };
 
-  const handleToggleSubtask = (taskId: string, subtaskId: string) => {
-    setTasks(
-      tasks.map((task) => {
+  const handleToggleSubtask = async (taskId: string, subtaskId: string) => {
+    let updatedSubtasks: any[] = [];
+
+    setTasks((prev) =>
+      prev.map((task) => {
         if (task.id !== taskId) return task;
-        const updatedSubtasks = task.subtasks.map((sub) =>
+        updatedSubtasks = task.subtasks.map((sub) =>
           sub.id === subtaskId ? { ...sub, completed: !sub.completed } : sub
         );
         return {
@@ -184,15 +315,38 @@ export default function App() {
         };
       })
     );
+
+    if (userId && userId !== "guest") {
+      await supabase
+        .from("tasks")
+        .update({ subtasks: updatedSubtasks })
+        .eq("id", taskId)
+        .eq("user_id", userId);
+    }
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    setTasks(tasks.filter((t) => t.id !== taskId));
+  const handleDeleteTask = async (taskId: string) => {
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
     if (activeTaskId === taskId) {
       setActiveTaskId(null);
       setTaskCompletedSessions(0);
       setTargetSessions(1);
       setStopTimerSignal((prev) => prev + 1);
+    }
+
+    if (userId && userId !== "guest") {
+      const { error } = await supabase
+        .from("tasks")
+        .delete()
+        .eq("id", taskId)
+        .eq("user_id", userId);
+
+      if (error) console.error("SUPABASE TASK DELETE FAILED:", error.message);
+    } else {
+      localStorage.setItem(
+        "pomo_guest_tasks",
+        JSON.stringify(tasks.filter((t) => t.id !== taskId))
+      );
     }
   };
 
@@ -201,12 +355,7 @@ export default function App() {
     setTaskCompletedSessions((prev) => {
       const next = prev + 1;
       if (next >= targetSessions && activeTaskId) {
-        // Mark task as completed when all required sessions are finished
-        setTasks((currentTasks) =>
-          currentTasks.map((t) =>
-            t.id === activeTaskId ? { ...t, completed: true } : t
-          )
-        );
+        handleToggleTask(activeTaskId);
         setActiveTaskId(null);
       }
       return next;
@@ -255,10 +404,10 @@ export default function App() {
         onOpenProfile={() => setIsProfileOpen(true)}
       />
 
-      {/* Main Bento Grid with matching height between Timer and (Tasks + Study Beats), fits comfortably on-screen */}
+      {/* Main Bento Grid */}
       <main className="w-full flex-1 max-w-[1280px] mx-auto px-4 sm:px-6 pt-18 pb-1.5 flex flex-col justify-center min-h-0">
         <div className="flex flex-col lg:flex-row gap-4 items-stretch h-auto lg:h-[calc(100vh-120px)] lg:max-h-[540px] min-h-0">
-          {/* Left Column: Pomodoro Timer (Strictly 55% width) */}
+          {/* Left Column: Pomodoro Timer */}
           <div className="w-full lg:w-[calc(55%-8px)] h-full flex flex-col min-h-0">
             <TimerCard
               isDark={isDark}
@@ -276,7 +425,7 @@ export default function App() {
             />
           </div>
 
-          {/* Right Column: Tasks + Study Beats (Strictly 45% width) */}
+          {/* Right Column: Tasks + Study Beats */}
           <div className="w-full lg:w-[calc(45%-8px)] h-full flex flex-col gap-3 min-h-0">
             <TaskListCard
               isDark={isDark}

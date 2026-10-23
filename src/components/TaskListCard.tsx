@@ -84,8 +84,8 @@ export default function TaskListCard({
                         onChange={(e) => setQuickInput(e.target.value)}
                         placeholder="Add a gentle task..."
                         className={`w-full h-7 pl-3 pr-8 rounded-full text-[11px] border focus:outline-none focus:ring-1 focus:ring-[#adf1dc] transition ${isDark
-                                ? "bg-[#161b1a] border-white/5 placeholder-white/30"
-                                : "bg-[#ebf6ef] border-black/5 placeholder-black/40"
+                            ? "bg-[#161b1a] border-white/5 placeholder-white/30"
+                            : "bg-[#ebf6ef] border-black/5 placeholder-black/40"
                             }`}
                     />
                     <button
@@ -120,12 +120,12 @@ export default function TaskListCard({
                             <li
                                 key={task.id}
                                 className={`rounded-lg transition border p-1.5 sm:p-2 ${isOngoing
-                                        ? isDark
-                                            ? "bg-[#162720] border-[#adf1dc]/70 ring-1 ring-[#adf1dc]/50"
-                                            : "bg-[#e5f8ee] border-[#adf1dc] ring-1 ring-[#adf1dc]/60"
-                                        : isDark
-                                            ? "bg-[#161b1a] border-white/5"
-                                            : "bg-[#ebf6ef] border-black/5"
+                                    ? isDark
+                                        ? "bg-[#162720] border-[#adf1dc]/70 ring-1 ring-[#adf1dc]/50"
+                                        : "bg-[#e5f8ee] border-[#adf1dc] ring-1 ring-[#adf1dc]/60"
+                                    : isDark
+                                        ? "bg-[#161b1a] border-white/5"
+                                        : "bg-[#ebf6ef] border-black/5"
                                     }`}
                             >
                                 {/* Main Task Header Row: Clicking here expands/collapses subtasks (NO start) */}
@@ -144,10 +144,10 @@ export default function TaskListCard({
                                                 onToggleTask(task.id);
                                             }}
                                             className={`w-4 h-4 rounded-full flex items-center justify-center transition flex-shrink-0 cursor-pointer ${isCompleted
-                                                    ? "bg-[#adf1dc] text-[#002019]"
-                                                    : isDark
-                                                        ? "bg-[#29332e] text-transparent hover:border-[#adf1dc]/50 border border-white/15"
-                                                        : "bg-white text-transparent hover:border-[#adf1dc] border border-black/20"
+                                                ? "bg-[#adf1dc] text-[#002019]"
+                                                : isDark
+                                                    ? "bg-[#29332e] text-transparent hover:border-[#adf1dc]/50 border border-white/15"
+                                                    : "bg-white text-transparent hover:border-[#adf1dc] border border-black/20"
                                                 }`}
                                         >
                                             <span className="material-symbols-outlined text-[10px]">
@@ -157,18 +157,26 @@ export default function TaskListCard({
 
                                         {/* Task Title & Details */}
                                         <div className="flex flex-col min-w-0 flex-1">
-                                            <div className="flex items-center gap-1.5 truncate">
+                                            <div className="flex items-center gap-1.5 min-w-0">
                                                 <span
-                                                    className={`text-[11px] ${isCompleted
-                                                            ? "line-through opacity-50"
-                                                            : "font-semibold"
+                                                    className={`text-[11px] truncate ${isCompleted
+                                                        ? "line-through opacity-50"
+                                                        : "font-semibold"
                                                         }`}
                                                 >
                                                     {task.title}
                                                 </span>
+                                                {task.reminderDate && (
+                                                    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#256959] dark:text-[#adf1dc] opacity-80 flex-shrink-0">
+                                                        <img src="/calendar_clock.png" alt="Reminder" className="w-3 h-3 object-contain inline-block" />
+                                                        <span>
+                                                            Reminder {task.reminderDate} {task.reminderTime ? `@ ${task.reminderTime}` : ""}
+                                                        </span>
+                                                    </span>
+                                                )}
                                                 {task.sprouts > 0 && (
                                                     <span className="text-[9px] font-medium opacity-65 flex-shrink-0">
-                                                        🌱 {task.sprouts} ({task.sprouts * 25}m)
+                                                        {task.sprouts} ({task.sprouts * 25}m)
                                                     </span>
                                                 )}
                                                 {hasSubtasks && (
@@ -180,16 +188,6 @@ export default function TaskListCard({
                                                     </span>
                                                 )}
                                             </div>
-
-                                            {/* Scheduled Reminder Badge (if Someday scheduled) */}
-                                            {task.reminderDate && (
-                                                <div className="flex items-center gap-1 text-[9px] font-medium text-[#256959] dark:text-[#adf1dc] opacity-80 mt-0.5">
-                                                    <img src="/calendar_clock.png" alt="Reminder" className="w-3 h-3 object-contain inline-block" />
-                                                    <span>
-                                                        {task.reminderDate} {task.reminderTime ? `@ ${task.reminderTime}` : ""}
-                                                    </span>
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
 
@@ -198,6 +196,11 @@ export default function TaskListCard({
                                         {task.priority === "focus" && (
                                             <span className="px-1.5 py-0.5 rounded-full bg-[#ffdade] text-[#874e58] text-[8px] uppercase font-bold tracking-wider">
                                                 Priority
+                                            </span>
+                                        )}
+                                        {task.priority === "later" && (
+                                            <span className="px-1.5 py-0.5 rounded-full bg-[#ebd5ff] text-[#6b21a8] text-[8px] uppercase font-bold tracking-wider">
+                                                Someday
                                             </span>
                                         )}
 
@@ -305,10 +308,10 @@ export default function TaskListCard({
                                             >
                                                 <span
                                                     className={`w-3 h-3 rounded-full flex items-center justify-center transition flex-shrink-0 ${subtask.completed
-                                                            ? "bg-[#adf1dc] text-[#002019]"
-                                                            : isDark
-                                                                ? "border border-white/20 text-transparent"
-                                                                : "border border-black/20 text-transparent"
+                                                        ? "bg-[#adf1dc] text-[#002019]"
+                                                        : isDark
+                                                            ? "border border-white/20 text-transparent"
+                                                            : "border border-black/20 text-transparent"
                                                         }`}
                                                 >
                                                     <span className="material-symbols-outlined text-[7px] font-bold">
@@ -317,8 +320,8 @@ export default function TaskListCard({
                                                 </span>
                                                 <span
                                                     className={`text-[10px] leading-tight break-words ${subtask.completed
-                                                            ? "line-through opacity-50"
-                                                            : "opacity-85"
+                                                        ? "line-through opacity-50"
+                                                        : "opacity-85"
                                                         }`}
                                                 >
                                                     {subtask.text}

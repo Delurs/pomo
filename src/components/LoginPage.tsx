@@ -107,8 +107,8 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
         const emailCheck = validateEmail(targetEmail);
         if (!emailCheck.isValid) throw new Error(emailCheck.error);
 
-        // SUPABASE PASSWORD RESET EMAIL (Redirects user to recovery page when clicked)
-        const redirectUrl = `${window.location.origin}/#reset-password`;
+        // Use a clean origin URL without "#" so Supabase can cleanly attach #access_token=...
+        const redirectUrl = window.location.origin;
         const { error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
           redirectTo: redirectUrl,
         });
@@ -130,42 +130,37 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
     onLogin("Mindful Guest", "guest");
   };
 
-  const inputClass = `w-full h-9 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] transition ${
-    isDark
+  const inputClass = `w-full h-9 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] transition ${isDark
       ? "bg-[#161b1a] border-white/10 text-white placeholder-white/30"
       : "bg-white border-black/10 text-black placeholder-black/30"
-  }`;
+    }`;
   const inputIconClass =
     "w-4 h-4 object-contain absolute left-3 top-1/2 -translate-y-1/2 opacity-60 pointer-events-none";
   const labelClass = "block text-[11px] font-semibold opacity-75 mb-0.5";
 
   return (
     <div
-      className={`h-screen w-full overflow-hidden flex relative transition-colors duration-300 ${
-        isDark ? "bg-[#141e19] text-[#e8f3ec]" : "bg-[#f1fcf4] text-[#141e19]"
-      }`}
+      className={`h-screen w-full overflow-hidden flex relative transition-colors duration-300 ${isDark ? "bg-[#141e19] text-[#e8f3ec]" : "bg-[#f1fcf4] text-[#141e19]"
+        }`}
     >
       {/* Theme Toggle (floating, top-right) */}
       <button
         onClick={() => setIsDark(!isDark)}
         aria-label="Toggle Light and Dark Mode"
-        className={`absolute top-4 right-4 sm:right-6 z-20 p-1 rounded-full border transition flex items-center cursor-pointer ${
-          isDark
+        className={`absolute top-4 right-4 sm:right-6 z-20 p-1 rounded-full border transition flex items-center cursor-pointer ${isDark
             ? "bg-[#1f2725] border-white/10 text-[#adf1dc]"
             : "bg-white border-black/5 text-[#256959] shadow-sm"
-        }`}
+          }`}
       >
         <span
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${
-            !isDark ? "bg-[#adf1dc] text-[#002019]" : "opacity-40"
-          }`}
+          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${!isDark ? "bg-[#adf1dc] text-[#002019]" : "opacity-40"
+            }`}
         >
           <img src="/light_mode.png" alt="Light mode" className="w-4 h-4 object-contain" />
         </span>
         <span
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${
-            isDark ? "bg-[#256959] text-white" : "opacity-40"
-          }`}
+          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${isDark ? "bg-[#256959] text-white" : "opacity-40"
+            }`}
         >
           <img src="/dark_mode.png" alt="Dark mode" className="w-4 h-4 object-contain" />
         </span>
@@ -173,25 +168,22 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
 
       {/* LEFT: Brand showcase */}
       <section
-        className={`hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden ${
-          isDark
+        className={`hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden ${isDark
             ? "bg-gradient-to-br from-[#1a2a24] via-[#16221d] to-[#0f1814]"
             : "bg-gradient-to-br from-[#d9f7e8] via-[#c4f0dc] to-[#adf1dc]"
-        }`}
+          }`}
       >
         {/* Ambient glows */}
         <div className="absolute -top-32 -left-32 w-[28rem] h-[28rem] rounded-full bg-[#adf1dc]/30 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-40 -right-24 w-[30rem] h-[30rem] rounded-full bg-[#256959]/25 blur-3xl pointer-events-none" />
         {/* Decorative rings */}
         <div
-          className={`absolute w-[34rem] h-[34rem] rounded-full border pointer-events-none ${
-            isDark ? "border-white/5" : "border-[#256959]/10"
-          }`}
+          className={`absolute w-[34rem] h-[34rem] rounded-full border pointer-events-none ${isDark ? "border-white/5" : "border-[#256959]/10"
+            }`}
         />
         <div
-          className={`absolute w-[44rem] h-[44rem] rounded-full border pointer-events-none ${
-            isDark ? "border-white/5" : "border-[#256959]/10"
-          }`}
+          className={`absolute w-[44rem] h-[44rem] rounded-full border pointer-events-none ${isDark ? "border-white/5" : "border-[#256959]/10"
+            }`}
         />
 
         <div className="relative z-10 flex flex-col items-center text-center px-10">
@@ -203,14 +195,12 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
           <img
             src="/logo-name.png"
             alt="Pomodoro Tortoise"
-            className={`h-9 xl:h-12 mt-5 object-contain ${
-              isDark ? "brightness-[2.2] contrast-125" : ""
-            }`}
+            className={`h-9 xl:h-12 mt-5 object-contain ${isDark ? "brightness-[2.2] contrast-125" : ""
+              }`}
           />
           <p
-            className={`mt-3 text-xs xl:text-sm font-medium tracking-wide ${
-              isDark ? "text-[#adf1dc]/80" : "text-[#256959]"
-            }`}
+            className={`mt-3 text-xs xl:text-sm font-medium tracking-wide ${isDark ? "text-[#adf1dc]/80" : "text-[#256959]"
+              }`}
           >
             Slow down. Focus deeply. Grow steadily.
           </p>
@@ -220,11 +210,10 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
       {/* RIGHT: Login card */}
       <main className="w-full lg:w-1/2 h-full flex items-center justify-center px-4 py-3 relative z-10">
         <div
-          className={`w-full max-w-md rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all ${
-            isDark
+          className={`w-full max-w-md rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all ${isDark
               ? "bg-[#1f2725]/90 border-white/10 text-[#e8f3ec]"
               : "bg-white/95 border-black/5 text-[#141e19]"
-          }`}
+            }`}
         >
           {/* Avatar & Title */}
           <div className="text-center mb-3">
@@ -246,9 +235,8 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
           {/* Sign In / Register tabs */}
           {mode !== "forgot" && (
             <div
-              className={`p-1 rounded-2xl flex items-center mb-3 border transition-colors ${
-                isDark ? "bg-[#161b1a] border-white/5" : "bg-[#ebf6ef] border-black/5"
-              }`}
+              className={`p-1 rounded-2xl flex items-center mb-3 border transition-colors ${isDark ? "bg-[#161b1a] border-white/5" : "bg-[#ebf6ef] border-black/5"
+                }`}
             >
               {(["signin", "register"] as const).map((m) => (
                 <button
@@ -258,9 +246,8 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
                     setMode(m);
                     resetMessages();
                   }}
-                  className={`flex-1 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
-                    mode === m ? "bg-[#adf1dc] text-[#002019] shadow-sm" : "opacity-60 hover:opacity-100"
-                  }`}
+                  className={`flex-1 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${mode === m ? "bg-[#adf1dc] text-[#002019] shadow-sm" : "opacity-60 hover:opacity-100"
+                    }`}
                 >
                   <img
                     src={m === "signin" ? "/login.png" : "/person_add.png"}
@@ -312,11 +299,10 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
                       setMode("signin");
                       resetMessages();
                     }}
-                    className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
-                      isDark
+                    className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${isDark
                         ? "border-white/10 hover:bg-white/5 text-slate-300"
                         : "border-black/10 hover:bg-black/5 text-slate-700"
-                    }`}
+                      }`}
                   >
                     Cancel
                   </button>
@@ -438,8 +424,8 @@ export default function LoginPage({ isDark, setIsDark, onLogin }: LoginPageProps
                     {isLoading
                       ? "Processing..."
                       : mode === "signin"
-                      ? "Login"
-                      : "Create Account"}
+                        ? "Login"
+                        : "Create Account"}
                   </span>
                 </button>
               </>
