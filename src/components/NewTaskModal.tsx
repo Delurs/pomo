@@ -124,7 +124,7 @@ export default function NewTaskModal({
                         </div>
                         <div>
                             <h3 className="font-bold text-base">
-                                {editingTask ? "Edit Gentle Task" : "New Gentle Task"}
+                                {editingTask ? "Edit Task" : "New Task"}
                             </h3>
                             <p className="text-xs opacity-60">
                                 {editingTask
@@ -136,11 +136,10 @@ export default function NewTaskModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer ${
-                            isDark
-                                ? "bg-[#161b1a] text-slate-300 hover:text-white hover:bg-[#283330] border border-white/10"
-                                : "bg-[#ebf6ef] text-[#002019] hover:bg-[#dfeee5]"
-                        }`}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer ${isDark
+                            ? "bg-[#161b1a] text-slate-300 hover:text-white hover:bg-[#283330] border border-white/10"
+                            : "bg-[#ebf6ef] text-[#002019] hover:bg-[#dfeee5]"
+                            }`}
                     >
                         <span className="material-symbols-outlined text-[16px]">close</span>
                     </button>
@@ -155,7 +154,7 @@ export default function NewTaskModal({
                             type="text"
                             autoFocus
                             required
-                            placeholder="What gentle accomplishment is calling you?"
+                            placeholder="What accomplishment is calling you?"
                             value={taskTitle}
                             onChange={(e) => setTaskTitle(e.target.value)}
                             className={`w-full h-10 px-3.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${isDark
@@ -169,7 +168,7 @@ export default function NewTaskModal({
                     <div>
                         <div className="flex justify-between items-center mb-1.5">
                             <label className="text-xs font-bold">
-                                Mini Subtasks & Stepping Stones
+                                Subtasks
                             </label>
                             <button
                                 type="button"
@@ -217,10 +216,10 @@ export default function NewTaskModal({
                         )}
                     </div>
 
-                    {/* Pomo Sprouts (Sessions) */}
+                    {/* Pomo Sessions */}
                     <div>
                         <div className="flex justify-between items-center mb-1.5">
-                            <label className="text-xs font-bold">Pomo Sprouts (Sessions)</label>
+                            <label className="text-xs font-bold">Pomo Sessions</label>
                             <span className="text-[11px] font-semibold text-[#256959] dark:text-[#adf1dc]">
                                 {taskSprouts * 25} mins focus
                             </span>
@@ -247,7 +246,7 @@ export default function NewTaskModal({
 
                     {/* Category Selector */}
                     <div>
-                        <label className="block text-xs font-bold mb-1.5">Category Ritual</label>
+                        <label className="block text-xs font-bold mb-1.5">Category</label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                             {CATEGORY_LIST.map((cat) => (
                                 <button
@@ -268,9 +267,9 @@ export default function NewTaskModal({
                         </div>
                     </div>
 
-                    {/* Priority Selector (Gentle Pace) */}
+                    {/* Priority Selector (Pace) */}
                     <div>
-                        <label className="block text-xs font-bold mb-1">Gentle Pace</label>
+                        <label className="block text-xs font-bold mb-1">Pace</label>
                         <div className="grid grid-cols-3 gap-2">
                             {(["flow", "focus", "later"] as const).map((p) => (
                                 <button
@@ -297,33 +296,29 @@ export default function NewTaskModal({
                     {/* Someday Reminder Picker (Date & Time) to avoid deadline cramping */}
                     {taskPriority === "later" && (
                         <div
-                            className={`p-3.5 rounded-2xl border space-y-2.5 transition ${
-                                isDark
-                                    ? "bg-[#161b1a] border-white/10 text-slate-200"
-                                    : "bg-[#ebf6ef] border-[#adf1dc]/40 text-[#141e19]"
-                            }`}
+                            className={`p-3.5 rounded-2xl border space-y-2.5 transition ${isDark
+                                ? "bg-[#161b1a] border-white/10 text-slate-200"
+                                : "bg-[#ebf6ef] border-[#adf1dc]/40 text-[#141e19]"
+                                }`}
                         >
                             <div
-                                className={`flex items-center gap-2 text-xs font-bold ${
-                                    isDark ? "text-[#adf1dc]" : "text-[#256959]"
-                                }`}
+                                className={`flex items-center gap-2 text-xs font-bold ${isDark ? "text-[#adf1dc]" : "text-[#256959]"
+                                    }`}
                             >
                                 <img src="/calendar_clock.png" alt="Calendar Clock" className="w-4 h-4 object-contain" />
-                                <span>Gentle Reminder & Recommended Schedule</span>
+                                <span>Reminder & Recommended Schedule</span>
                             </div>
                             <p
-                                className={`text-[11px] leading-snug ${
-                                    isDark ? "text-slate-300 opacity-90" : "text-slate-600 opacity-90"
-                                }`}
+                                className={`text-[11px] leading-snug ${isDark ? "text-slate-300 opacity-90" : "text-slate-600 opacity-90"
+                                    }`}
                             >
                                 Schedule a calm calendar date & time recommended for this task so it never feels rushed or cramped.
                             </p>
                             <div className="grid grid-cols-2 gap-2.5">
                                 <div>
                                     <label
-                                        className={`block text-[10px] font-bold mb-1 ${
-                                            isDark ? "text-slate-200" : "text-slate-700"
-                                        }`}
+                                        className={`block text-[10px] font-bold mb-1 ${isDark ? "text-slate-200" : "text-slate-700"
+                                            }`}
                                     >
                                         Recommended Date
                                     </label>
@@ -332,18 +327,16 @@ export default function NewTaskModal({
                                         value={reminderDate}
                                         min={new Date().toISOString().split("T")[0]}
                                         onChange={(e) => setReminderDate(e.target.value)}
-                                        className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${
-                                            isDark
-                                                ? "bg-[#1f2725] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
-                                                : "bg-white border-black/10 text-[#141e19]"
-                                        }`}
+                                        className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${isDark
+                                            ? "bg-[#1f2725] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
+                                            : "bg-white border-black/10 text-[#141e19]"
+                                            }`}
                                     />
                                 </div>
                                 <div>
                                     <label
-                                        className={`block text-[10px] font-bold mb-1 ${
-                                            isDark ? "text-slate-200" : "text-slate-700"
-                                        }`}
+                                        className={`block text-[10px] font-bold mb-1 ${isDark ? "text-slate-200" : "text-slate-700"
+                                            }`}
                                     >
                                         Recommended Time
                                     </label>
@@ -351,11 +344,10 @@ export default function NewTaskModal({
                                         type="time"
                                         value={reminderTime}
                                         onChange={(e) => setReminderTime(e.target.value)}
-                                        className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${
-                                            isDark
-                                                ? "bg-[#1f2725] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
-                                                : "bg-white border-black/10 text-[#141e19]"
-                                        }`}
+                                        className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${isDark
+                                            ? "bg-[#1f2725] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
+                                            : "bg-white border-black/10 text-[#141e19]"
+                                            }`}
                                     />
                                 </div>
                             </div>

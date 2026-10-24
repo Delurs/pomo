@@ -56,6 +56,14 @@ export default function App() {
         setUserName(name);
         localStorage.setItem("pomo_user_name", name);
         localStorage.setItem("pomo_user_id", session.user.id);
+      } else {
+        const savedId = localStorage.getItem("pomo_user_id");
+        if (savedId === "guest") {
+          setIsAuthenticated(true);
+          setUserId("guest");
+          const name = localStorage.getItem("pomo_user_name") || "Mindful Guest";
+          setUserName(name);
+        }
       }
     });
 
@@ -73,9 +81,12 @@ export default function App() {
         localStorage.setItem("pomo_user_name", name);
         localStorage.setItem("pomo_user_id", session.user.id);
       } else {
-        setIsAuthenticated(false);
-        setUserId(null);
-        setTasks([]);
+        const savedId = localStorage.getItem("pomo_user_id");
+        if (savedId !== "guest") {
+          setIsAuthenticated(false);
+          setUserId(null);
+          setTasks([]);
+        }
       }
     });
 
@@ -146,6 +157,8 @@ export default function App() {
     }
     localStorage.removeItem("pomo_is_logged_in");
     sessionStorage.removeItem("pomo_is_logged_in");
+    localStorage.removeItem("pomo_user_id");
+    localStorage.removeItem("pomo_user_name");
     setIsAuthenticated(false);
     setUserId(null);
     setTasks([]);
@@ -369,12 +382,21 @@ export default function App() {
       <ResetPasswordPage
         isDark={isDark}
         setIsDark={setIsDark}
-        onComplete={() => {
+        onComplete={async () => {
           setIsPasswordRecovery(false);
           window.history.replaceState(null, "", window.location.pathname);
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            setIsAuthenticated(true);
+            setUserId(session.user.id);
+            setUserName(session.user.user_metadata?.username || "Mindful Sprout");
+          }
         }}
-        onLater={() => {
+        onLater={async () => {
+          await supabase.auth.signOut();
           setIsPasswordRecovery(false);
+          setIsAuthenticated(false);
+          setUserId(null);
           window.history.replaceState(null, "", window.location.pathname);
         }}
       />
@@ -471,6 +493,7 @@ export default function App() {
           tasks={tasks}
           completedSessions={totalSessions}
           onLogout={handleLogout}
+          isGuest={userId === "guest"}
         />
       )}
 
