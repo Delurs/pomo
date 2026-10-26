@@ -49,7 +49,7 @@ export default function TimesUpModal({
           onClick={onClose}
           className="w-full h-12 rounded-2xl bg-[#adf1dc] text-[#002019] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition shadow-md shadow-[#adf1dc]/25 cursor-pointer"
         >
-          <span className="material-symbols-outlined text-[20px]">close</span>
+          <img src="/close.png" alt="Close" className="w-4 h-4 object-contain inline-block" />
           <span>Close</span>
         </button>
       </div>

@@ -76,6 +76,18 @@ export default function TimerCard({
     };
   }, []);
 
+  // Monitor timer progress from browser tab title
+  useEffect(() => {
+    if (isRunning) {
+      document.title = `(${formatDisplayTime(timeLeft)}) Pomodoro Tortoise`;
+    } else {
+      document.title = "Pomodoro Tortoise";
+    }
+    return () => {
+      document.title = "Pomodoro Tortoise";
+    };
+  }, [isRunning, timeLeft]);
+
   const handleCloseTimesUp = () => {
     timerAudio.stopAlarmSound();
     setIsTimesUpOpen(false);
@@ -319,7 +331,7 @@ export default function TimerCard({
           className="min-w-[150px] h-[44px] px-6 rounded-full bg-[#adf1dc] text-[#002019] font-bold text-sm flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition shadow-md shadow-[#adf1dc]/20 cursor-pointer"
         >
           {isRunning ? (
-            <span className="material-symbols-outlined text-[20px]">pause</span>
+            <img src="/pause.png" alt="Pause" className="w-5 h-5 object-contain" />
           ) : (
             <img src="/play_arrow.png" alt="Play" className="w-5 h-5 object-contain" />
           )}

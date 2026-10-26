@@ -106,7 +106,7 @@ export default function IntroVideo({ onComplete }: IntroVideoProps) {
                 title="Skip Intro"
             >
                 <span>Skip</span>
-                <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                <img src="/arrow_forward.png" alt="Skip" className="w-3.5 h-3.5 object-contain" />
             </button>
         </div>
     );

@@ -209,14 +209,16 @@ export default function TaskListCard({
                                                     e.stopPropagation();
                                                     onToggleTask(task.id);
                                                 }}
-                                                className={`w-4 h-4 rounded-full flex items-center justify-center transition flex-shrink-0 cursor-pointer ${isDark
+                                                className={`w-4 h-4 rounded-full flex items-center justify-center transition flex-shrink-0 cursor-pointer group/chk ${isDark
                                                         ? "bg-[#29332e] hover:border-[#adf1dc]/50 border border-white/15"
                                                         : "bg-white hover:border-[#adf1dc] border border-black/20"
                                                     }`}
                                             >
-                                                <span className="material-symbols-outlined text-[10px] text-transparent hover:text-slate-400">
-                                                    check
-                                                </span>
+                                                <img
+                                                    src="/check.png"
+                                                    alt="Complete"
+                                                    className="w-2.5 h-2.5 object-contain opacity-0 group-hover/chk:opacity-50 transition-opacity"
+                                                />
                                             </button>
 
                                             {/* Task Info */}
@@ -233,9 +235,11 @@ export default function TaskListCard({
                                                     {hasSubtasks && (
                                                         <span className="text-[9px] font-semibold text-[#256959] dark:text-[#adf1dc] opacity-75 flex items-center gap-0.5 flex-shrink-0 ml-1">
                                                             <span>{task.subtasks.length} steps</span>
-                                                            <span className="material-symbols-outlined text-[12px]">
-                                                                {isExpanded ? "expand_less" : "expand_more"}
-                                                            </span>
+                                                            <img
+                                                                src={isExpanded ? "/chevron_up.png" : "/chevron_down.png"}
+                                                                alt={isExpanded ? "Collapse" : "Expand"}
+                                                                className="w-2.5 h-2.5 object-contain"
+                                                            />
                                                         </span>
                                                     )}
                                                 </div>
@@ -283,7 +287,7 @@ export default function TaskListCard({
                                                         <span>Ongoing</span>
                                                     </span>
                                                     <span className="absolute inset-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-1 bg-[#ffdade] text-[#874e58] font-bold text-[10px] rounded-full">
-                                                        <span className="material-symbols-outlined text-[12px]">stop</span>
+                                                        <img src="/stop.png" alt="Stop" className="w-3 h-3 object-contain inline-block" />
                                                         <span>Stop</span>
                                                     </span>
                                                 </button>
@@ -310,7 +314,7 @@ export default function TaskListCard({
                                                 className="opacity-70 hover:opacity-100 hover:text-[#256959] dark:hover:text-[#adf1dc] p-0.5 transition cursor-pointer"
                                                 title="Edit task"
                                             >
-                                                <span className="material-symbols-outlined text-[14px]">edit</span>
+                                                <img src="/edit.png" alt="Edit" className="w-3.5 h-3.5 object-contain" />
                                             </button>
 
                                             {/* Delete Button */}
@@ -323,7 +327,7 @@ export default function TaskListCard({
                                                 className="opacity-70 hover:opacity-100 hover:text-red-400 p-0.5 transition cursor-pointer"
                                                 title="Delete task"
                                             >
-                                                <span className="material-symbols-outlined text-[14px]">close</span>
+                                                <img src="/close.png" alt="Delete" className="w-3.5 h-3.5 object-contain" />
                                             </button>
                                         </div>
                                     </div>
@@ -346,7 +350,13 @@ export default function TaskListCard({
                                                                 : "border border-black/20 dark:border-white/20 text-transparent"
                                                             }`}
                                                     >
-                                                        <span className="material-symbols-outlined text-[7px] font-bold">check</span>
+                                                        {subtask.completed && (
+                                                            <img
+                                                                src="/check.png"
+                                                                alt="Completed"
+                                                                className="w-2 h-2 object-contain"
+                                                            />
+                                                        )}
                                                     </span>
                                                     <span
                                                         className={`text-[10px] ${subtask.completed ? "line-through opacity-50" : "opacity-85"
@@ -373,9 +383,11 @@ export default function TaskListCard({
                             className="w-full flex items-center justify-between text-[10px] font-semibold opacity-60 hover:opacity-100 py-1 transition cursor-pointer"
                         >
                             <span className="flex items-center gap-1">
-                                <span className="material-symbols-outlined text-[12px]">
-                                    {showCompleted ? "expand_more" : "chevron_right"}
-                                </span>
+                                <img
+                                    src={showCompleted ? "/chevron_down.png" : "/chevron_right.png"}
+                                    alt={showCompleted ? "Collapse" : "Expand"}
+                                    className="w-3 h-3 object-contain"
+                                />
                                 <span>Completed Tasks ({completedTasks.length})</span>
                             </span>
                             <span className="text-[9px] underline opacity-75">
@@ -400,9 +412,11 @@ export default function TaskListCard({
                                                 title="Click to restore to active tasks"
                                                 className="w-4 h-4 rounded-full bg-[#adf1dc] text-[#002019] flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition"
                                             >
-                                                <span className="material-symbols-outlined text-[10px] font-bold">
-                                                    check
-                                                </span>
+                                                <img
+                                                    src="/check.png"
+                                                    alt="Completed"
+                                                    className="w-2.5 h-2.5 object-contain"
+                                                />
                                             </button>
                                             <span className="text-[11px] truncate line-through opacity-60">
                                                 {task.title}
@@ -424,7 +438,7 @@ export default function TaskListCard({
                                                 className="opacity-50 hover:opacity-100 hover:text-red-400 p-0.5 transition cursor-pointer"
                                                 title="Delete completed task"
                                             >
-                                                <span className="material-symbols-outlined text-[14px]">close</span>
+                                                <img src="/close.png" alt="Delete" className="w-3.5 h-3.5 object-contain" />
                                             </button>
                                         </div>
                                     </li>

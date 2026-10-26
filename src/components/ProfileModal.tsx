@@ -188,7 +188,7 @@ export default function ProfileModal({
                 : "bg-[#ebf6ef] text-[#002019] hover:bg-[#dfeee5]"
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <img src="/close.png" alt="Close" className="w-4 h-4 object-contain" />
           </button>
         </div>
 
@@ -241,7 +241,7 @@ export default function ProfileModal({
                         className="opacity-50 hover:opacity-100 transition cursor-pointer p-0.5"
                         title="Edit name"
                       >
-                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                        <img src="/edit.png" alt="Edit" className="w-3.5 h-3.5 object-contain" />
                       </button>
                     )}
                   </div>

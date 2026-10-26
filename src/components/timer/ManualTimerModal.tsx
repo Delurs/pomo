@@ -77,7 +77,7 @@ export default function ManualTimerModal({
                 : "bg-[#ebf6ef] text-[#002019] hover:bg-[#dfeee5]"
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">close</span>
+            <img src="/close.png" alt="Close" className="w-3.5 h-3.5 object-contain" />
           </button>
         </div>
 
@@ -139,9 +139,11 @@ export default function ManualTimerModal({
           {/* Long Duration Notice */}
           {isLongDuration && (
             <div className="p-2.5 rounded-2xl bg-[#ebf6ef] dark:bg-[#161b1a] border border-[#adf1dc]/40 flex items-start gap-2 text-xs">
-              <span className="material-symbols-outlined text-[#256959] dark:text-[#adf1dc] text-[18px] flex-shrink-0 mt-0.5">
-                schedule
-              </span>
+              <img
+                src="/schedule_info.png"
+                alt="Schedule Info"
+                className="w-4 h-4 object-contain flex-shrink-0 mt-0.5"
+              />
               <div className="opacity-85 text-[11px]">
                 <span>
                   Duration exceeds 25m: automatically includes <strong>5 min Break</strong>{" "}

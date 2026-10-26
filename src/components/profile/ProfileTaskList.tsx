@@ -59,7 +59,19 @@ export default function ProfileTaskList({
                 }`}
               >
                 <div className="flex items-center gap-2.5 truncate">
-                  <span className="text-sm">{t.completed ? "✅" : "⏳"}</span>
+                  {t.completed ? (
+                    <img
+                      src="/check_circle.png"
+                      alt="Completed"
+                      className="w-4 h-4 object-contain inline-block flex-shrink-0"
+                    />
+                  ) : (
+                    <img
+                      src="/status_pending.png"
+                      alt="Pending"
+                      className="w-4 h-4 object-contain inline-block flex-shrink-0"
+                    />
+                  )}
                   <span
                     className={`truncate font-medium ${
                       t.completed ? "line-through opacity-50" : ""

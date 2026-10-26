@@ -106,7 +106,7 @@ export default function ResetPasswordPage({
 
   return (
     <div
-      className={`h-screen w-full overflow-hidden flex relative transition-colors duration-300 ${isDark ? "bg-[#141e19] text-[#e8f3ec]" : "bg-[#f1fcf4] text-[#141e19]"
+      className={`min-h-screen w-full overflow-y-auto flex relative transition-colors duration-300 ${isDark ? "bg-[#141e19] text-[#e8f3ec]" : "bg-[#f1fcf4] text-[#141e19]"
         }`}
     >
       {/* Theme Toggle (top-right) */}
@@ -136,7 +136,7 @@ export default function ResetPasswordPage({
       <AuthShowcase isDark={isDark} />
 
       {/* RIGHT: Reset Password Card */}
-      <main className="w-full lg:w-1/2 h-full flex items-center justify-center px-4 py-3 relative z-10">
+      <main className="w-full lg:w-1/2 min-h-screen flex items-center justify-center px-4 py-6 relative z-10">
         <div
           className={`w-full max-w-md rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all ${isDark
             ? "bg-[#1f2725]/90 border-white/10 text-[#e8f3ec]"
@@ -157,13 +157,13 @@ export default function ResetPasswordPage({
 
           {errorMsg && (
             <div className="mb-3 px-3 py-1.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-500 dark:text-red-400 text-[11px] font-medium flex items-center gap-1.5 animate-in fade-in duration-150">
-              <span className="material-symbols-outlined text-[15px] flex-shrink-0">error</span>
+              <img src="/error_alert.png" alt="Error" className="w-4 h-4 object-contain flex-shrink-0" />
               <span className="leading-tight">{errorMsg}</span>
             </div>
           )}
           {successMsg && (
             <div className="mb-3 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-medium flex items-center gap-1.5 animate-in fade-in duration-150">
-              <span className="material-symbols-outlined text-[15px] flex-shrink-0">check_circle</span>
+              <img src="/check_circle.png" alt="Success" className="w-4 h-4 object-contain flex-shrink-0" />
               <span className="leading-tight">{successMsg}</span>
             </div>
           )}

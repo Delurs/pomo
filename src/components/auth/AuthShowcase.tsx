@@ -5,7 +5,7 @@ interface AuthShowcaseProps {
 export default function AuthShowcase({ isDark }: AuthShowcaseProps) {
   return (
     <section
-      className={`hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden ${
+      className={`hidden lg:flex lg:w-1/2 min-h-screen relative items-center justify-center overflow-hidden ${
         isDark
           ? "bg-gradient-to-br from-[#1a2a24] via-[#16221d] to-[#0f1814]"
           : "bg-gradient-to-br from-[#d9f7e8] via-[#c4f0dc] to-[#adf1dc]"

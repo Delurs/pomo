@@ -91,7 +91,7 @@ export default function InteractiveCalendar({
               : "hover:bg-black/5 text-slate-700 hover:text-black"
           }`}
         >
-          <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+          <img src="/chevron_left.png" alt="Previous month" className="w-3.5 h-3.5 object-contain" />
         </button>
 
         <select
@@ -138,7 +138,7 @@ export default function InteractiveCalendar({
               : "hover:bg-black/5 text-slate-700 hover:text-black"
           }`}
         >
-          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+          <img src="/chevron_right.png" alt="Next month" className="w-3.5 h-3.5 object-contain" />
         </button>
 
         <button

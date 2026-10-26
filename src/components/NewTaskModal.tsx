@@ -141,7 +141,7 @@ export default function NewTaskModal({
                             : "bg-[#ebf6ef] text-[#002019] hover:bg-[#dfeee5]"
                             }`}
                     >
-                        <span className="material-symbols-outlined text-[16px]">close</span>
+                        <img src="/close.png" alt="Close" className="w-3.5 h-3.5 object-contain" />
                     </button>
                 </div>
 
@@ -204,11 +204,10 @@ export default function NewTaskModal({
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveSubtask(sub.id)}
-                                            className="opacity-40 hover:opacity-100 hover:text-red-400 cursor-pointer"
+                                            className="opacity-40 hover:opacity-100 hover:text-red-400 cursor-pointer p-0.5"
+                                            title="Remove step"
                                         >
-                                            <span className="material-symbols-outlined text-[14px]">
-                                                close
-                                            </span>
+                                            <img src="/close.png" alt="Remove" className="w-3 h-3 object-contain" />
                                         </button>
                                     </div>
                                 ))}
