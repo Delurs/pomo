@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { type TimerMode, TIMER_CONFIGS } from "../../types/pomo";
 
 interface TimerDialProps {
@@ -42,20 +43,23 @@ export default function TimerDial({
   return (
     <div className="relative z-10 my-1 sm:my-1.5 flex items-center justify-center gap-3 sm:gap-6 w-full max-w-sm">
       {/* -15 Seconds Button */}
-      <button
+      <motion.button
         type="button"
+        whileHover={{ scale: 1.15 }}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 500, damping: 17 }}
         onClick={() => onAdjustTime(-15)}
         disabled={timeLeft <= 0}
         title="Subtract 15 seconds"
         aria-label="Subtract 15 seconds"
-        className={`bg-transparent border-0 border-none p-1 font-mono font-bold text-base sm:text-lg transition-all select-none ${
+        className={`bg-transparent border-0 border-none p-1 font-mono font-bold text-base sm:text-lg transition-colors select-none ${
           timeLeft <= 0
             ? "opacity-20 cursor-not-allowed pointer-events-none"
-            : "cursor-pointer hover:scale-115 active:scale-95 opacity-60 hover:opacity-100"
-        } ${isDark ? "text-[#adf1dc]" : "text-[#256959]"}`}
+            : "cursor-pointer opacity-60 hover:opacity-100"
+        } ${isDark ? "text-[var(--theme-accent,#adf1dc)]" : "text-[var(--theme-deep,#256959)]"}`}
       >
         -15
-      </button>
+      </motion.button>
 
       {/* Circular Countdown Dial */}
       <div className="relative w-52 h-52 sm:w-60 sm:h-60 flex items-center justify-center flex-shrink-0">
@@ -67,13 +71,15 @@ export default function TimerDial({
             stroke="currentColor"
             strokeWidth="9"
             fill="transparent"
-            className={isDark ? "text-white/5" : "text-[#ebf6ef]"}
+            style={{
+              color: isDark ? "rgba(255, 255, 255, 0.05)" : "var(--theme-subtle-light, #ebf6ef)",
+            }}
           />
           <circle
             cx="140"
             cy="140"
             r="120"
-            stroke="#adf1dc"
+            stroke="var(--theme-accent, #adf1dc)"
             strokeWidth="9"
             strokeDasharray="753.98"
             strokeDashoffset={strokeOffset}
@@ -102,8 +108,8 @@ export default function TimerDial({
           <div
             className={`inline-flex items-center px-3 py-0.5 mt-2 rounded-full text-[11px] font-semibold shadow-xs border ${
               isDark
-                ? "bg-[#161b1a] border-white/10 text-[#adf1dc]"
-                : "bg-[#ebf6ef] border-black/5 text-[#002019]"
+                ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/10 text-[var(--theme-accent,#adf1dc)]"
+                : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5 text-[var(--theme-deep,#256959)]"
             }`}
           >
             <span>Session {completedSessions + 1}</span>
@@ -112,17 +118,20 @@ export default function TimerDial({
       </div>
 
       {/* +15 Seconds Button */}
-      <button
+      <motion.button
         type="button"
+        whileHover={{ scale: 1.15 }}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 500, damping: 17 }}
         onClick={() => onAdjustTime(15)}
         title="Add 15 seconds"
         aria-label="Add 15 seconds"
-        className={`bg-transparent border-0 border-none p-1 font-mono font-bold text-base sm:text-lg transition-all select-none cursor-pointer hover:scale-115 active:scale-95 opacity-60 hover:opacity-100 ${
-          isDark ? "text-[#adf1dc]" : "text-[#256959]"
+        className={`bg-transparent border-0 border-none p-1 font-mono font-bold text-base sm:text-lg transition-colors select-none cursor-pointer opacity-60 hover:opacity-100 ${
+          isDark ? "text-[var(--theme-accent,#adf1dc)]" : "text-[var(--theme-deep,#256959)]"
         }`}
       >
         +15
-      </button>
+      </motion.button>
     </div>
   );
 }

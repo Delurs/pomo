@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { type Task, type Subtask, CATEGORY_LIST } from "../types/pomo";
+import { modalBackdropVariants, modalDialogVariants } from "./ui/FluidAnimations";
 
 interface NewTaskModalProps {
     isDark: boolean;
@@ -47,8 +49,6 @@ export default function NewTaskModal({
             setSubtasks([]);
         }
     }, [editingTask, initialTitle, isOpen]);
-
-    if (!isOpen) return null;
 
     const handleAddSubtaskField = () => {
         setSubtasks([
@@ -111,11 +111,25 @@ export default function NewTaskModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div
-                className={`w-full max-w-[520px] max-h-[90vh] overflow-y-auto rounded-3xl p-6 border shadow-2xl relative ${isDark ? "bg-[#1f2725] border-white/10" : "bg-white border-black/5"
-                    }`}
-            >
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    variants={modalBackdropVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    onClick={onClose}
+                    className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+                >
+                    <motion.div
+                        variants={modalDialogVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        onClick={(e) => e.stopPropagation()}
+                        className={`w-full max-w-[520px] max-h-[90vh] overflow-y-auto rounded-3xl p-6 border shadow-2xl relative ${isDark ? "bg-[#1f2725] border-white/10" : "bg-white border-black/5"
+                            }`}
+                    >
                 {/* Modal Header */}
                 <div className="flex items-center justify-between pb-4 border-b border-black/5 dark:border-white/5 mb-4">
                     <div className="flex items-center gap-3">
@@ -137,8 +151,8 @@ export default function NewTaskModal({
                         type="button"
                         onClick={onClose}
                         className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer ${isDark
-                            ? "bg-[#161b1a] text-slate-300 hover:text-white hover:bg-[#283330] border border-white/10"
-                            : "bg-[#ebf6ef] text-[#002019] hover:bg-[#dfeee5]"
+                            ? "bg-[var(--theme-subtle-dark,#161b1a)] text-slate-300 hover:text-white hover:bg-white/10 border border-white/10"
+                            : "bg-[var(--theme-subtle-light,#ebf6ef)] text-[#002019] hover:bg-[var(--theme-hover-light,#dfeee5)]"
                             }`}
                     >
                         <img src="/close.png" alt="Close" className="w-3.5 h-3.5 object-contain" />
@@ -157,9 +171,9 @@ export default function NewTaskModal({
                             placeholder="What accomplishment is calling you?"
                             value={taskTitle}
                             onChange={(e) => setTaskTitle(e.target.value)}
-                            className={`w-full h-10 px-3.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${isDark
-                                ? "bg-[#161b1a] border-white/5 placeholder-white/30"
-                                : "bg-[#ebf6ef] border-black/5 placeholder-black/40"
+                            className={`w-full h-10 px-3.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${isDark
+                                ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5 placeholder-white/30"
+                                : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5 placeholder-black/40"
                                 }`}
                         />
                     </div>
@@ -173,7 +187,7 @@ export default function NewTaskModal({
                             <button
                                 type="button"
                                 onClick={handleAddSubtaskField}
-                                className="text-[11px] font-semibold text-[#256959] dark:text-[#adf1dc] flex items-center gap-1 cursor-pointer"
+                                className="text-[11px] font-semibold text-[var(--theme-deep,#256959)] dark:text-[var(--theme-accent,#adf1dc)] flex items-center gap-1 cursor-pointer"
                             >
                                 <img src="/add.png" alt="Add" className="w-3.5 h-3.5 object-contain" />
                                 <span>Add step</span>
@@ -197,8 +211,8 @@ export default function NewTaskModal({
                                                 handleUpdateSubtask(sub.id, e.target.value)
                                             }
                                             className={`flex-1 h-8 px-2.5 rounded-lg text-xs border focus:outline-none ${isDark
-                                                ? "bg-[#161b1a] border-white/5"
-                                                : "bg-[#ebf6ef] border-black/5"
+                                                ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5"
+                                                : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5"
                                                 }`}
                                         />
                                         <button
@@ -219,7 +233,7 @@ export default function NewTaskModal({
                     <div>
                         <div className="flex justify-between items-center mb-1.5">
                             <label className="text-xs font-bold">Pomo Sessions</label>
-                            <span className="text-[11px] font-semibold text-[#256959] dark:text-[#adf1dc]">
+                            <span className="text-[11px] font-semibold text-[var(--theme-deep,#256959)] dark:text-[var(--theme-accent,#adf1dc)]">
                                 {taskSprouts * 25} mins focus
                             </span>
                         </div>
@@ -230,10 +244,10 @@ export default function NewTaskModal({
                                     type="button"
                                     onClick={() => setTaskSprouts(num)}
                                     className={`py-2 px-1 rounded-xl text-xs font-bold border transition cursor-pointer flex flex-col items-center justify-center gap-0.5 ${taskSprouts === num
-                                        ? "bg-[#adf1dc] text-[#002019] border-[#adf1dc] shadow-sm"
+                                        ? "bg-[var(--theme-accent,#adf1dc)] text-[#002019] border-[var(--theme-accent,#adf1dc)] shadow-sm"
                                         : isDark
-                                            ? "bg-[#161b1a] border-white/5 hover:bg-[#283330]"
-                                            : "bg-[#ebf6ef] border-black/5 hover:bg-[#e0ebe3]"
+                                            ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5 hover:bg-white/10"
+                                            : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5 hover:bg-[var(--theme-hover-light,#dfeee5)]"
                                         }`}
                                 >
                                     <span className="font-extrabold">{num}</span>
@@ -253,10 +267,10 @@ export default function NewTaskModal({
                                     type="button"
                                     onClick={() => setTaskCategory(cat.id)}
                                     className={`py-2 px-3 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${taskCategory === cat.id
-                                        ? "bg-[#adf1dc] text-[#002019] border-[#adf1dc] shadow-sm font-bold"
+                                        ? "bg-[var(--theme-accent,#adf1dc)] text-[#002019] border-[var(--theme-accent,#adf1dc)] shadow-sm font-bold"
                                         : isDark
-                                            ? "bg-[#161b1a] border-white/5 hover:bg-[#283330] text-zinc-300"
-                                            : "bg-[#ebf6ef] border-black/5 hover:bg-[#e0ebe3] text-zinc-700"
+                                            ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5 hover:bg-white/10 text-zinc-300"
+                                            : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5 hover:bg-[var(--theme-hover-light,#dfeee5)] text-zinc-700"
                                         }`}
                                 >
                                     <img src={cat.icon} alt={cat.name} className="w-4 h-4 object-contain flex-shrink-0" />
@@ -276,10 +290,10 @@ export default function NewTaskModal({
                                     type="button"
                                     onClick={() => setTaskPriority(p)}
                                     className={`py-1.5 rounded-full text-xs transition cursor-pointer ${taskPriority === p
-                                        ? "bg-[#adf1dc] text-[#002019] font-bold shadow-sm"
+                                        ? "bg-[var(--theme-accent,#adf1dc)] text-[#002019] font-bold shadow-sm"
                                         : isDark
-                                            ? "bg-[#161b1a]"
-                                            : "bg-[#ebf6ef]"
+                                            ? "bg-[var(--theme-subtle-dark,#161b1a)]"
+                                            : "bg-[var(--theme-subtle-light,#ebf6ef)]"
                                         }`}
                                 >
                                     {p === "focus"
@@ -296,12 +310,12 @@ export default function NewTaskModal({
                     {taskPriority === "later" && (
                         <div
                             className={`p-3.5 rounded-2xl border space-y-2.5 transition ${isDark
-                                ? "bg-[#161b1a] border-white/10 text-slate-200"
-                                : "bg-[#ebf6ef] border-[#adf1dc]/40 text-[#141e19]"
+                                ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/10 text-slate-200"
+                                : "bg-[var(--theme-subtle-light,#ebf6ef)] border-[var(--theme-accent,#adf1dc)]/40 text-[#141e19]"
                                 }`}
                         >
                             <div
-                                className={`flex items-center gap-2 text-xs font-bold ${isDark ? "text-[#adf1dc]" : "text-[#256959]"
+                                className={`flex items-center gap-2 text-xs font-bold ${isDark ? "text-[var(--theme-accent,#adf1dc)]" : "text-[var(--theme-deep,#256959)]"
                                     }`}
                             >
                                 <img src="/calendar_clock.png" alt="Calendar Clock" className="w-4 h-4 object-contain" />
@@ -326,7 +340,7 @@ export default function NewTaskModal({
                                         value={reminderDate}
                                         min={new Date().toISOString().split("T")[0]}
                                         onChange={(e) => setReminderDate(e.target.value)}
-                                        className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${isDark
+                                        className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${isDark
                                             ? "bg-[#1f2725] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
                                             : "bg-white border-black/10 text-[#141e19]"
                                             }`}
@@ -343,7 +357,7 @@ export default function NewTaskModal({
                                         type="time"
                                         value={reminderTime}
                                         onChange={(e) => setReminderTime(e.target.value)}
-                                        className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${isDark
+                                        className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${isDark
                                             ? "bg-[#1f2725] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
                                             : "bg-white border-black/10 text-[#141e19]"
                                             }`}
@@ -364,13 +378,15 @@ export default function NewTaskModal({
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2 rounded-full bg-[#adf1dc] text-[#002019] font-bold text-xs hover:scale-105 transition shadow-sm cursor-pointer"
+                            className="px-6 py-2 rounded-full bg-[var(--theme-accent,#adf1dc)] text-[#002019] font-bold text-xs hover:scale-105 transition shadow-sm cursor-pointer"
                         >
                             {editingTask ? "Save Changes" : "Add to My Day"}
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 }

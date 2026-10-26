@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 
 interface MusicPlayerCardProps {
     isDark: boolean;
@@ -93,30 +94,33 @@ export default function MusicPlayerCard({ isDark, stopMusicSignal = 0 }: MusicPl
                     )}
                 </div>
 
-                {/* Mood Chips: 2x2 grid on small screens, flex on larger screens */}
+                {/* Mood Chips with bouncy spring hover/tap physics */}
                 <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 mb-2 w-full">
                     {MOOD_PRESETS.map((item) => (
-                        <button
+                        <motion.button
                             key={item.id}
                             type="button"
+                            whileHover={{ scale: 1.05, y: -1 }}
+                            whileTap={{ scale: 0.94 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 18 }}
                             onClick={() => {
                                 setSelectedMood(item.id);
                                 setEmbedUrl(item.embedUrl);
                             }}
-                            className={`w-full sm:w-auto px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium transition cursor-pointer flex items-center justify-center gap-1.5 text-center ${selectedMood === item.id
-                                ? "bg-[#adf1dc] text-[#002019] shadow-sm font-semibold"
+                            className={`w-full sm:w-auto px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-center ${selectedMood === item.id
+                                ? "bg-[var(--theme-accent,#adf1dc)] text-[#002019] shadow-sm font-semibold"
                                 : isDark
-                                    ? "bg-[#161b1a] text-slate-300 hover:bg-[#283330]"
-                                    : "bg-[#ebf6ef] text-[#57615c] hover:bg-[#e0ebe3]"
+                                    ? "bg-[var(--theme-subtle-dark,#161b1a)] text-slate-300 hover:bg-white/10"
+                                    : "bg-[var(--theme-subtle-light,#ebf6ef)] text-[#57615c] hover:bg-[var(--theme-hover-light,#dfeee5)]"
                                 }`}
                         >
                             <img src={item.iconSrc} alt={item.label} className="w-3.5 h-3.5 object-contain flex-shrink-0" />
                             <span>{item.label}</span>
-                        </button>
+                        </motion.button>
                     ))}
                 </div>
 
-                {/* Custom Link Input with generous left padding so icon never overlaps placeholder */}
+                {/* Custom Link Input with bouncy load button */}
                 <form onSubmit={handleLoadCustomMedia} className="relative flex items-center w-full">
                     <img src="/link.png" alt="Link" className="w-3.5 h-3.5 object-contain absolute left-2.5 opacity-60 pointer-events-none" />
                     <input
@@ -124,44 +128,60 @@ export default function MusicPlayerCard({ isDark, stopMusicSignal = 0 }: MusicPl
                         placeholder="Paste YouTube or Spotify Link..."
                         value={musicInputUrl}
                         onChange={(e) => setMusicInputUrl(e.target.value)}
-                        className={`w-full h-7 sm:h-7.5 pl-8 sm:pl-8.5 pr-14 sm:pr-15 rounded-full text-[10.5px] border focus:outline-none focus:ring-1 focus:ring-[#adf1dc] transition ${isDark
-                            ? "bg-[#161b1a] border-white/5 placeholder-white/30"
-                            : "bg-[#ebf6ef] border-black/5 placeholder-black/40"
+                        className={`w-full h-7 sm:h-7.5 pl-8 sm:pl-8.5 pr-14 sm:pr-15 rounded-full text-[10.5px] border focus:outline-none focus:ring-1 focus:ring-[var(--theme-accent,#adf1dc)] transition ${isDark
+                            ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5 placeholder-white/30"
+                            : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5 placeholder-black/40"
                             }`}
                     />
-                    <button
+                    <motion.button
                         type="submit"
-                        className="absolute right-1 px-3 py-1 rounded-full bg-[#adf1dc] text-[#002019] text-[11px] font-bold hover:scale-105 active:scale-95 transition cursor-pointer shadow-xs"
+                        whileHover={{ scale: 1.06 }}
+                        whileTap={{ scale: 0.94 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 18 }}
+                        className="absolute right-1 px-3 py-1 rounded-full bg-[var(--theme-accent,#adf1dc)] text-[#002019] text-[11px] font-bold transition-all cursor-pointer shadow-xs select-none"
                     >
                         Load
-                    </button>
+                    </motion.button>
                 </form>
             </div>
 
-            {/* Media Frame or Clean Empty State */}
-            {embedUrl ? (
-                <div className="flex-1 min-h-0 w-full rounded-xl overflow-hidden border border-black/5 dark:border-white/5 bg-black/10">
-                    <iframe
-                        src={embedUrl}
-                        width="100%"
-                        height="100%"
-                        className="w-full h-full min-h-[175px]"
-                        frameBorder="0"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy"
-                        title="Study Audio Stream"
-                    />
-                </div>
-            ) : (
-                <div
-                    className={`flex-1 min-h-0 w-full flex items-center justify-center rounded-xl p-3 text-center border border-dashed ${isDark ? "border-white/10" : "border-black/10"
-                        }`}
-                >
-                    <p className="text-[10px] opacity-50">
-                        No audio loaded. Select a mood preset above or paste a YouTube / Spotify link.
-                    </p>
-                </div>
-            )}
+            {/* Media Frame appearance animated with motion.div */}
+            <AnimatePresence mode="wait">
+                {embedUrl ? (
+                    <motion.div
+                        key={embedUrl}
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.96 }}
+                        transition={{ duration: 0.25 }}
+                        className="flex-1 min-h-0 w-full rounded-xl overflow-hidden border border-black/5 dark:border-white/5 bg-black/10"
+                    >
+                        <iframe
+                            src={embedUrl}
+                            width="100%"
+                            height="100%"
+                            className="w-full h-full min-h-[175px]"
+                            frameBorder="0"
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy"
+                            title="Study Audio Stream"
+                        />
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="empty"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className={`flex-1 min-h-0 w-full flex items-center justify-center rounded-xl p-3 text-center border border-dashed ${isDark ? "border-white/10" : "border-black/10"
+                            }`}
+                    >
+                        <p className="text-[10px] opacity-50">
+                            No audio loaded. Select a mood preset above or paste a YouTube / Spotify link.
+                        </p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </section>
     );
 }

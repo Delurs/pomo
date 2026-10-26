@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 export const MONTH_NAMES = [
   "January",
   "February",
@@ -147,13 +148,13 @@ export default function InteractiveCalendar({
           title="Jump to today's date"
           className={`px-2.5 py-1 rounded-full text-[10.5px] font-bold transition flex items-center gap-1 cursor-pointer shadow-xs ${
             isDark
-              ? "bg-[#adf1dc] text-[#002019] hover:bg-[#cbf7ea] hover:scale-105 active:scale-95"
-              : "bg-[#256959] text-white hover:bg-[#1b4e42] hover:scale-105 active:scale-95"
+              ? "bg-[var(--theme-accent,#adf1dc)] text-[#002019] hover:opacity-90 hover:scale-105 active:scale-95"
+              : "bg-[var(--theme-deep,#256959)] text-white hover:opacity-90 hover:scale-105 active:scale-95"
           }`}
         >
           <span
             className={`w-1.5 h-1.5 rounded-full ${
-              isDark ? "bg-[#002019]" : "bg-emerald-300"
+              isDark ? "bg-[#002019]" : "bg-white/80"
             } animate-pulse`}
           />
           <span>Today</span>
@@ -187,18 +188,21 @@ export default function InteractiveCalendar({
             const taskCountOnDate = tasksByDate[dateKey] || 0;
 
             return (
-              <button
+              <motion.button
                 key={`day-${dayNum}`}
                 type="button"
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 500, damping: 18 }}
                 onClick={() => handleDayClick(dayNum)}
                 title={`${MONTH_NAMES[viewMonth]} ${dayNum}, ${viewYear}${
                   taskCountOnDate > 0 ? ` (${taskCountOnDate} task${taskCountOnDate > 1 ? "s" : ""})` : ""
                 }`}
-                className={`h-7 rounded-lg text-[11px] font-semibold flex flex-col items-center justify-center relative transition cursor-pointer ${
+                className={`h-7 rounded-lg text-[11px] font-semibold flex flex-col items-center justify-center relative transition-colors cursor-pointer select-none ${
                   isSelected
-                    ? "bg-[#adf1dc] text-[#002019] font-black shadow-md ring-2 ring-[#002019]"
+                    ? "bg-[var(--theme-accent,#adf1dc)] text-[#002019] font-black shadow-md ring-2 ring-[#002019]"
                     : isRealToday
-                      ? "border-2 border-[#adf1dc] text-[#256959] dark:text-[#adf1dc] font-black"
+                      ? "border-2 border-[var(--theme-accent,#adf1dc)] text-[var(--theme-deep,#256959)] dark:text-[var(--theme-accent,#adf1dc)] font-black"
                       : isDark
                         ? "hover:bg-white/10 text-white/90"
                         : "hover:bg-black/5 text-black/90"
@@ -212,12 +216,12 @@ export default function InteractiveCalendar({
                       isSelected
                         ? "bg-[#002019]"
                         : isRealToday
-                          ? "bg-[#256959] dark:bg-[#adf1dc]"
-                          : "bg-emerald-500"
+                          ? "bg-[var(--theme-deep,#256959)] dark:bg-[var(--theme-accent,#adf1dc)]"
+                          : "bg-[var(--theme-deep,#256959)]/70 dark:bg-[var(--theme-accent,#adf1dc)]/70"
                     }`}
                   />
                 )}
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -225,7 +229,7 @@ export default function InteractiveCalendar({
 
       <div className="pt-2 mt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between text-[10px]">
         {selectedDateStr ? (
-          <div className="flex items-center gap-1.5 w-full justify-between text-[#256959] dark:text-[#adf1dc] font-bold">
+          <div className="flex items-center gap-1.5 w-full justify-between text-[var(--theme-deep,#256959)] dark:text-[var(--theme-accent,#adf1dc)] font-bold">
             <span>
               Selected: {selectedDateStr} ({tasksByDate[selectedDateStr] || 0} tasks)
             </span>

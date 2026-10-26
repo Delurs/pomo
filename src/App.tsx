@@ -9,9 +9,13 @@ import NewTaskModal from "./components/NewTaskModal";
 import ProfileModal from "./components/ProfileModal";
 import LoginPage from "./components/LoginPage";
 import ResetPasswordPage from "./components/ResetPasswordPage";
+import { type ThemeColor, THEME_COLORS } from "./types/themeColors";
 
 export default function App() {
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [colorTheme, setColorTheme] = useState<ThemeColor>(() => {
+    return (localStorage.getItem("pomo_theme_color") as ThemeColor) || "green";
+  });
 
   useEffect(() => {
     if (isDark) {
@@ -20,6 +24,24 @@ export default function App() {
       document.documentElement.classList.remove("dark");
     }
   }, [isDark]);
+
+  useEffect(() => {
+    localStorage.setItem("pomo_theme_color", colorTheme);
+    const theme = THEME_COLORS[colorTheme] || THEME_COLORS.green;
+    const root = document.documentElement;
+    root.style.setProperty("--theme-accent", theme.accent);
+    root.style.setProperty("--theme-accent-dark", theme.accentDark);
+    root.style.setProperty("--theme-deep", theme.deep);
+    root.style.setProperty("--theme-bg-light", theme.bgLight);
+    root.style.setProperty("--theme-bg-dark", theme.bgDark);
+    root.style.setProperty("--theme-card-light", theme.cardLight);
+    root.style.setProperty("--theme-card-dark", theme.cardDark);
+    root.style.setProperty("--theme-subtle-light", theme.subtleLight);
+    root.style.setProperty("--theme-subtle-dark", theme.subtleDark);
+    root.style.setProperty("--theme-active-light", theme.activeLight);
+    root.style.setProperty("--theme-active-dark", theme.activeDark);
+    root.style.setProperty("--theme-hover-light", theme.subtleHoverLight);
+  }, [colorTheme]);
 
   // AUTH STATE
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -413,15 +435,23 @@ export default function App() {
     );
   }
 
+  const currentTheme = THEME_COLORS[colorTheme] || THEME_COLORS.green;
+
   return (
     <div
-      className={`min-h-screen flex flex-col justify-between transition-colors duration-300 ${isDark ? "bg-[#141e19] text-[#e8f3ec]" : "bg-[#f1fcf4] text-[#141e19]"
-        }`}
+      style={{
+        backgroundColor: isDark ? currentTheme.bgDark : currentTheme.bgLight,
+      }}
+      className={`min-h-screen flex flex-col justify-between transition-colors duration-300 ${
+        isDark ? "text-[#e8f3ec]" : "text-[#141e19]"
+      }`}
     >
       {/* Top Navbar */}
       <Header
         isDark={isDark}
         setIsDark={setIsDark}
+        currentColor={colorTheme}
+        onSelectColor={setColorTheme}
         completedSessions={totalSessions}
         onOpenProfile={() => setIsProfileOpen(true)}
       />
@@ -469,33 +499,29 @@ export default function App() {
       </main>
 
       {/* Detailed Task Creation / Edit Modal */}
-      {isModalOpen && (
-        <NewTaskModal
-          isDark={isDark}
-          isOpen={isModalOpen}
-          initialTitle={modalInitialTitle}
-          editingTask={editingTask}
-          onClose={() => {
-            setIsModalOpen(false);
-            setEditingTask(null);
-          }}
-          onCreateTask={handleCreateDetailedTask}
-          onUpdateTask={handleUpdateTask}
-        />
-      )}
+      <NewTaskModal
+        isDark={isDark}
+        isOpen={isModalOpen}
+        initialTitle={modalInitialTitle}
+        editingTask={editingTask}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingTask(null);
+        }}
+        onCreateTask={handleCreateDetailedTask}
+        onUpdateTask={handleUpdateTask}
+      />
 
       {/* Profile & Focus Analytics Modal */}
-      {isProfileOpen && (
-        <ProfileModal
-          isDark={isDark}
-          isOpen={isProfileOpen}
-          onClose={() => setIsProfileOpen(false)}
-          tasks={tasks}
-          completedSessions={totalSessions}
-          onLogout={handleLogout}
-          isGuest={userId === "guest"}
-        />
-      )}
+      <ProfileModal
+        isDark={isDark}
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        tasks={tasks}
+        completedSessions={totalSessions}
+        onLogout={handleLogout}
+        isGuest={userId === "guest"}
+      />
 
       {/* Minimal Relaxed Footer */}
       <footer className="w-full py-2.5 text-center text-xs opacity-50 flex-shrink-0 flex items-center justify-center gap-2">

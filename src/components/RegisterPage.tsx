@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { motion } from "motion/react";
 import { supabase } from "../lib/supabaseClient";
 import AuthShowcase from "./auth/AuthShowcase";
 import { validateEmail } from "./auth/emailValidator";
+import { ThemeTogglerButton } from "./ui/FluidAnimations";
 
 export interface RegisterPageProps {
   isDark: boolean;
@@ -113,30 +115,9 @@ export default function RegisterPage({
       }`}
     >
       {/* Theme Toggle Button */}
-      <button
-        onClick={() => setIsDark(!isDark)}
-        aria-label="Toggle Light and Dark Mode"
-        className={`absolute top-4 right-4 sm:right-6 z-20 p-1 rounded-full border transition flex items-center cursor-pointer ${
-          isDark
-            ? "bg-[#1f2725] border-white/10 text-[#adf1dc]"
-            : "bg-white border-black/5 text-[#256959] shadow-sm"
-        }`}
-      >
-        <span
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${
-            !isDark ? "bg-[#adf1dc] text-[#002019]" : "opacity-40"
-          }`}
-        >
-          <img src="/light_mode.png" alt="Light mode" className="w-4 h-4 object-contain" />
-        </span>
-        <span
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${
-            isDark ? "bg-[#256959] text-white" : "opacity-40"
-          }`}
-        >
-          <img src="/dark_mode.png" alt="Dark mode" className="w-4 h-4 object-contain" />
-        </span>
-      </button>
+      <div className="absolute top-4 right-4 sm:right-6 z-20">
+        <ThemeTogglerButton isDark={isDark} onToggle={() => setIsDark(!isDark)} />
+      </div>
 
       {/* Brand Showcase (Desktop left side) */}
       <AuthShowcase isDark={isDark} />
@@ -271,26 +252,32 @@ export default function RegisterPage({
               </div>
             </div>
 
-            <button
+            <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-1 py-2 rounded-xl bg-[#adf1dc] text-[#002019] text-xs sm:text-sm font-bold hover:scale-[1.01] active:scale-[0.99] transition cursor-pointer shadow-md flex items-center justify-center gap-2 disabled:opacity-60"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 500, damping: 18 }}
+              className="w-full mt-1 py-2 rounded-xl bg-[#adf1dc] text-[#002019] text-xs sm:text-sm font-bold transition cursor-pointer shadow-md flex items-center justify-center gap-2 disabled:opacity-60 select-none"
             >
               <img src="/how_to_reg.png" alt="Register" className="w-4 h-4 object-contain inline-block" />
               <span>{isLoading ? "Creating Account..." : "Create Account"}</span>
-            </button>
+            </motion.button>
           </form>
 
           {/* Guest Mode fallback */}
           <div className="mt-2.5 pt-2.5 border-t border-black/5 dark:border-white/5 text-center">
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 500, damping: 18 }}
               onClick={handleGuestMode}
-              className="text-[11px] opacity-60 hover:opacity-100 hover:underline cursor-pointer transition flex items-center justify-center gap-1.5 mx-auto"
+              className="text-[11px] opacity-60 hover:opacity-100 hover:underline cursor-pointer transition flex items-center justify-center gap-1.5 mx-auto select-none"
             >
               <img src="/spa.png" alt="Guest" className="w-3.5 h-3.5 object-contain inline-block" />
               <span>Continue as Mindful Guest</span>
-            </button>
+            </motion.button>
           </div>
         </div>
       </main>

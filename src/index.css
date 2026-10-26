@@ -1,6 +1,21 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --theme-accent: #adf1dc;
+    --theme-accent-dark: #adf1dc;
+    --theme-deep: #256959;
+    --theme-bg-light: #f1fcf4;
+    --theme-bg-dark: #141e19;
+    --theme-card-light: #ffffff;
+    --theme-card-dark: #1f2725;
+    --theme-subtle-light: #ebf6ef;
+    --theme-subtle-dark: #161b1a;
+    --theme-active-light: #e5f8ee;
+    --theme-active-dark: #162720;
+    --theme-hover-light: #dfeee5;
+  }
+
   html, body {
     height: 100%;
     margin: 0;

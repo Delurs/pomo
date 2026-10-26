@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { motion } from "motion/react";
 import { supabase } from "../lib/supabaseClient";
 import AuthShowcase from "./auth/AuthShowcase";
+import { ThemeTogglerButton } from "./ui/FluidAnimations";
 
 export interface ResetPasswordPageProps {
   isDark: boolean;
@@ -110,27 +112,9 @@ export default function ResetPasswordPage({
         }`}
     >
       {/* Theme Toggle (top-right) */}
-      <button
-        onClick={() => setIsDark(!isDark)}
-        aria-label="Toggle Light and Dark Mode"
-        className={`absolute top-4 right-4 sm:right-6 z-20 p-1 rounded-full border transition flex items-center cursor-pointer ${isDark
-          ? "bg-[#1f2725] border-white/10 text-[#adf1dc]"
-          : "bg-white border-black/5 text-[#256959] shadow-sm"
-          }`}
-      >
-        <span
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${!isDark ? "bg-[#adf1dc] text-[#002019]" : "opacity-40"
-            }`}
-        >
-          <img src="/light_mode.png" alt="Light mode" className="w-4 h-4 object-contain" />
-        </span>
-        <span
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition ${isDark ? "bg-[#256959] text-white" : "opacity-40"
-            }`}
-        >
-          <img src="/dark_mode.png" alt="Dark mode" className="w-4 h-4 object-contain" />
-        </span>
-      </button>
+      <div className="absolute top-4 right-4 sm:right-6 z-20">
+        <ThemeTogglerButton isDark={isDark} onToggle={() => setIsDark(!isDark)} />
+      </div>
 
       {/* LEFT: Brand showcase */}
       <AuthShowcase isDark={isDark} />
@@ -225,7 +209,10 @@ export default function ResetPasswordPage({
             </div>
 
             <div className="pt-2 flex items-center gap-2.5">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: "spring", stiffness: 500, damping: 20 }}
                 type="button"
                 onClick={onLater}
                 className={`flex-1 py-2.5 rounded-xl text-xs font-semibold border transition cursor-pointer hover:opacity-90 ${isDark
@@ -234,15 +221,18 @@ export default function ResetPasswordPage({
                   }`}
               >
                 Cancel
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: "spring", stiffness: 500, damping: 20 }}
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 py-2.5 rounded-xl bg-[#adf1dc] text-[#002019] text-xs font-bold hover:scale-[1.01] active:scale-[0.99] transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-60"
+                className="flex-1 py-2.5 rounded-xl bg-[#adf1dc] text-[#002019] text-xs font-bold transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-60"
               >
                 <img src="/lock_reset.png" alt="Change Password" className="w-4 h-4 object-contain inline-block" />
                 <span>{isLoading ? "Updating..." : "Change Password"}</span>
-              </button>
+              </motion.button>
             </div>
           </form>
         </div>

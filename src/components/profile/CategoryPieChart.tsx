@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "motion/react";
 import { type Task, CATEGORY_META } from "../../types/pomo";
 
 interface CategoryPieChartProps {
@@ -108,9 +109,12 @@ export default function CategoryPieChart({
             const isActive = isSelected || isHovered;
 
             return (
-              <button
+              <motion.button
                 key={item.key}
                 type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 450, damping: 20 }}
                 onClick={() =>
                   setSelectedCategory((prev) => (prev === item.key ? null : item.key))
                 }
@@ -118,12 +122,12 @@ export default function CategoryPieChart({
                 onMouseLeave={() => setHoveredCategory(null)}
                 title={`Click to view ${item.meta.label} stats inside chart`}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition cursor-pointer select-none ${
-                  isActive ? "ring-2 ring-[#adf1dc] scale-105 shadow-sm" : ""
+                  isActive ? "ring-2 ring-[var(--theme-accent,#adf1dc)] scale-105 shadow-sm" : ""
                 } ${
                   item.hasTasks
                     ? isDark
-                      ? "bg-[#161b1a] border-white/10 text-white shadow-xs hover:border-[#adf1dc]/40"
-                      : "bg-[#f1fcf4] border-black/5 text-[#002019] shadow-xs hover:border-[#adf1dc]"
+                      ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/10 text-white shadow-xs hover:border-[var(--theme-accent,#adf1dc)]/40"
+                      : "bg-[var(--theme-bg-light,#f1fcf4)] border-black/5 text-[#002019] shadow-xs hover:border-[var(--theme-accent,#adf1dc)]"
                     : isDark
                       ? "bg-[#161b1a]/40 border-white/5 text-white/50 hover:opacity-80"
                       : "bg-black/[0.02] border-black/5 text-black/50 hover:opacity-80"
@@ -142,7 +146,7 @@ export default function CategoryPieChart({
                   className="w-3.5 h-3.5 object-contain flex-shrink-0"
                 />
                 <span className="truncate">{item.meta.label}</span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -230,7 +234,7 @@ export default function CategoryPieChart({
                   </span>
                   <span className="text-xs font-semibold opacity-60">completed</span>
                 </div>
-                <span className="text-xs font-bold text-[#256959] dark:text-[#adf1dc] mt-0.5">
+                <span className="text-xs font-bold text-[var(--theme-deep,#256959)] dark:text-[var(--theme-accent,#adf1dc)] mt-0.5">
                   {activeCategoryItem.percent}%
                 </span>
               </>

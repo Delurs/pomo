@@ -40,7 +40,7 @@ export default function ProfileTaskList({
           <button
             type="button"
             onClick={onClearDateFilter}
-            className="text-[11px] text-[#256959] dark:text-[#adf1dc] font-semibold hover:underline cursor-pointer"
+            className="text-[11px] text-[var(--theme-deep,#256959)] dark:text-[var(--theme-accent,#adf1dc)] font-semibold hover:underline cursor-pointer"
           >
             View all in {timeFilter}
           </button>

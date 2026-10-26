@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { modalBackdropVariants, modalDialogVariants } from "../ui/FluidAnimations";
 
 interface ManualTimerModalProps {
   isOpen: boolean;
@@ -30,8 +32,6 @@ export default function ManualTimerModal({
     }
   }, [isOpen, initialSeconds]);
 
-  if (!isOpen) return null;
-
   const totalManualSeconds = manualHours * 3600 + manualMinutes * 60 + manualSeconds;
   const isLongDuration = totalManualSeconds > 25 * 60;
   const previewSessions = isLongDuration ? Math.max(2, Math.round(totalManualSeconds / 1800)) : 1;
@@ -48,18 +48,31 @@ export default function ManualTimerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className={`w-full max-w-[440px] rounded-3xl p-6 border shadow-2xl relative ${
-          isDark
-            ? "bg-[#1f2725] border-white/10 text-[#e8f3ec]"
-            : "bg-white border-black/5 text-[#141e19]"
-        }`}
-      >
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          variants={modalBackdropVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          onClick={onClose}
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+        >
+          <motion.div
+            variants={modalDialogVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-[440px] rounded-3xl p-6 border shadow-2xl relative ${
+              isDark
+                ? "bg-[#1f2725] border-white/10 text-[#e8f3ec]"
+                : "bg-white border-black/5 text-[#141e19]"
+            }`}
+          >
         <div className="flex items-center justify-between pb-3 border-b border-black/5 dark:border-white/5 mb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-[#adf1dc] text-[#002019] flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-full bg-[var(--theme-accent,#adf1dc)] text-[#002019] flex items-center justify-center font-bold">
               <img src="/Timer.png" alt="Timer" className="w-5 h-5 object-contain" />
             </div>
             <div>
@@ -73,8 +86,8 @@ export default function ManualTimerModal({
             aria-label="Close Manual Timer"
             className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer ${
               isDark
-                ? "bg-[#161b1a] text-slate-300 hover:text-white hover:bg-[#283330] border border-white/10"
-                : "bg-[#ebf6ef] text-[#002019] hover:bg-[#dfeee5]"
+                ? "bg-[var(--theme-subtle-dark,#161b1a)] text-slate-300 hover:text-white hover:bg-white/10 border border-white/10"
+                : "bg-[var(--theme-subtle-light,#ebf6ef)] text-[#002019] hover:bg-[var(--theme-hover-light,#dfeee5)]"
             }`}
           >
             <img src="/close.png" alt="Close" className="w-3.5 h-3.5 object-contain" />
@@ -92,8 +105,8 @@ export default function ManualTimerModal({
                 max="23"
                 value={manualHours}
                 onChange={(e) => setManualHours(Math.max(0, parseInt(e.target.value) || 0))}
-                className={`w-full text-center h-12 rounded-2xl text-lg font-bold font-mono border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${
-                  isDark ? "bg-[#161b1a] border-white/5" : "bg-[#ebf6ef] border-black/5"
+                className={`w-full text-center h-12 rounded-2xl text-lg font-bold font-mono border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${
+                  isDark ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5" : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5"
                 }`}
               />
               <span className="text-[10px] opacity-50 mt-1">0 - 23 hr</span>
@@ -110,8 +123,8 @@ export default function ManualTimerModal({
                 onChange={(e) =>
                   setManualMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))
                 }
-                className={`w-full text-center h-12 rounded-2xl text-lg font-bold font-mono border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${
-                  isDark ? "bg-[#161b1a] border-white/5" : "bg-[#ebf6ef] border-black/5"
+                className={`w-full text-center h-12 rounded-2xl text-lg font-bold font-mono border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${
+                  isDark ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5" : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5"
                 }`}
               />
               <span className="text-[10px] opacity-50 mt-1">0 - 59 min</span>
@@ -128,8 +141,8 @@ export default function ManualTimerModal({
                 onChange={(e) =>
                   setManualSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))
                 }
-                className={`w-full text-center h-12 rounded-2xl text-lg font-bold font-mono border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${
-                  isDark ? "bg-[#161b1a] border-white/5" : "bg-[#ebf6ef] border-black/5"
+                className={`w-full text-center h-12 rounded-2xl text-lg font-bold font-mono border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${
+                  isDark ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5" : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5"
                 }`}
               />
               <span className="text-[10px] opacity-50 mt-1">0 - 59 sec</span>
@@ -138,7 +151,7 @@ export default function ManualTimerModal({
 
           {/* Long Duration Notice */}
           {isLongDuration && (
-            <div className="p-2.5 rounded-2xl bg-[#ebf6ef] dark:bg-[#161b1a] border border-[#adf1dc]/40 flex items-start gap-2 text-xs">
+            <div className="p-2.5 rounded-2xl bg-[var(--theme-subtle-light,#ebf6ef)] dark:bg-[var(--theme-subtle-dark,#161b1a)] border border-[var(--theme-accent,#adf1dc)]/40 flex items-start gap-2 text-xs">
               <img
                 src="/schedule_info.png"
                 alt="Schedule Info"
@@ -180,10 +193,10 @@ export default function ManualTimerModal({
                     manualHours === preset.h &&
                     manualMinutes === preset.m &&
                     manualSeconds === preset.s
-                      ? "bg-[#adf1dc] text-[#002019] border-[#adf1dc] font-bold"
+                      ? "bg-[var(--theme-accent,#adf1dc)] text-[#002019] border-[var(--theme-accent,#adf1dc)] font-bold"
                       : isDark
-                        ? "bg-[#161b1a] border-white/5 hover:bg-[#283330]"
-                        : "bg-[#ebf6ef] border-black/5 hover:bg-[#e0ebe3]"
+                        ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5 hover:bg-white/10"
+                        : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5 hover:bg-[var(--theme-hover-light,#dfeee5)]"
                   }`}
                 >
                   {preset.label}
@@ -203,13 +216,15 @@ export default function ManualTimerModal({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-full bg-[#adf1dc] text-[#002019] font-bold text-xs hover:scale-105 active:scale-95 transition shadow-sm cursor-pointer"
+              className="px-5 py-2 rounded-full bg-[var(--theme-accent,#adf1dc)] text-[#002019] font-bold text-xs hover:scale-105 active:scale-95 transition shadow-sm cursor-pointer"
             >
               Apply Timer
             </button>
           </div>
         </form>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

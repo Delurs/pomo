@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { type Task } from "../types/pomo";
 import LogoutConfirmModal from "./profile/LogoutConfirmModal";
 import PasswordChangeDrawer from "./profile/PasswordChangeDrawer";
 import CategoryPieChart from "./profile/CategoryPieChart";
 import InteractiveCalendar from "./profile/InteractiveCalendar";
 import ProfileTaskList from "./profile/ProfileTaskList";
+import { modalBackdropVariants, modalDialogVariants } from "./ui/FluidAnimations";
 
 export interface ProfileModalProps {
   isDark: boolean;
@@ -74,8 +76,6 @@ export default function ProfileModal({
     if (isOpen) window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
 
   const handleSaveName = () => {
     const trimmed = tempName.trim() || "Mindful Sprout";
@@ -148,60 +148,72 @@ export default function ProfileModal({
   }, {} as Record<string, number>);
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
-      onClick={onClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className={`w-full ${
-          isGuest ? "max-w-xl" : "max-w-3xl"
-        } max-h-[92vh] overflow-y-auto rounded-3xl p-6 md:p-8 border shadow-2xl relative transition-all ${
-          isDark
-            ? "bg-[#1f2725] border-white/10 text-[#e8f3ec]"
-            : "bg-white border-black/5 text-[#141e19]"
-        }`}
-      >
-        {/* Modal Header */}
-        <div className="flex items-center justify-between pb-5 border-b border-black/5 dark:border-white/5 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#adf1dc] text-[#002019] flex items-center justify-center font-bold shadow-sm p-1.5">
-              <img src="/profile.png" alt="Profile" className="w-full h-full object-contain" />
-            </div>
-            <div>
-              <h3 className="font-bold text-lg tracking-tight">Profile & Sanctuary</h3>
-              <p className="text-xs opacity-60">
-                {isGuest
-                  ? "Mindful Guest workspace session"
-                  : "Manage your account and productivity overview"}
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close Profile"
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer ${
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          variants={modalBackdropVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          onClick={onClose}
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+        >
+          <motion.div
+            variants={modalDialogVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full ${
+              isGuest ? "max-w-xl" : "max-w-3xl"
+            } max-h-[92vh] overflow-y-auto rounded-3xl p-6 md:p-8 border shadow-2xl relative transition-colors duration-200 ${
               isDark
-                ? "bg-[#161b1a] text-slate-300 hover:text-white hover:bg-[#283330] border border-white/10"
-                : "bg-[#ebf6ef] text-[#002019] hover:bg-[#dfeee5]"
+                ? "bg-[#1f2725] border-white/10 text-[#e8f3ec]"
+                : "bg-white border-black/5 text-[#141e19]"
             }`}
           >
-            <img src="/close.png" alt="Close" className="w-4 h-4 object-contain" />
-          </button>
-        </div>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-5 border-b border-black/5 dark:border-white/5 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[var(--theme-accent,#adf1dc)] text-[#002019] flex items-center justify-center font-bold shadow-sm p-1.5">
+                  <img src="/profile.png" alt="Profile" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg tracking-tight">Profile & Sanctuary</h3>
+                  <p className="text-xs opacity-60">
+                    {isGuest
+                      ? "Mindful Guest workspace session"
+                      : "Manage your account and productivity overview"}
+                  </p>
+                </div>
+              </div>
+
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                onClick={onClose}
+                aria-label="Close Profile"
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer select-none ${
+                  isDark
+                    ? "bg-[var(--theme-subtle-dark,#161b1a)] text-slate-300 hover:text-white hover:bg-white/10 border border-white/10"
+                    : "bg-[var(--theme-subtle-light,#ebf6ef)] text-[#002019] hover:bg-[var(--theme-hover-light,#dfeee5)]"
+                }`}
+              >
+                <img src="/close.png" alt="Close" className="w-4 h-4 object-contain" />
+              </motion.button>
+            </div>
 
         {/* Profile Card & Account Controls */}
         <div
-          className={`rounded-2xl p-6 border mb-6 transition-all ${
-            isDark ? "bg-[#161b1a] border-white/5" : "bg-[#f1fcf4] border-black/5"
+          className={`rounded-2xl p-6 border mb-6 transition-colors duration-200 ${
+            isDark ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5" : "bg-[var(--theme-bg-light,#f1fcf4)] border-black/5"
           }`}
         >
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             {/* User Info */}
             <div className="flex flex-col sm:flex-row items-center gap-3.5">
-              <div className="w-16 h-16 rounded-2xl bg-[#adf1dc] text-[#002019] flex items-center justify-center font-bold shadow-sm p-2.5 flex-shrink-0">
+              <div className="w-16 h-16 rounded-2xl bg-[var(--theme-accent,#adf1dc)] text-[#002019] flex items-center justify-center font-bold shadow-sm p-2.5 flex-shrink-0">
                 <img src="/profile.png" alt="Profile" className="w-full h-full object-contain" />
               </div>
 
@@ -223,7 +235,7 @@ export default function ProfileModal({
                     <button
                       type="button"
                       onClick={handleSaveName}
-                      className="px-3 py-1 rounded-lg text-xs font-semibold bg-[#adf1dc] text-[#002019] cursor-pointer hover:opacity-90 flex-shrink-0"
+                      className="px-3 py-1 rounded-lg text-xs font-semibold bg-[var(--theme-accent,#adf1dc)] text-[#002019] cursor-pointer hover:opacity-90 flex-shrink-0"
                     >
                       Save
                     </button>
@@ -258,7 +270,7 @@ export default function ProfileModal({
                 <button
                   type="button"
                   onClick={() => setIsChangingPassword(true)}
-                  className="px-4 py-1.5 rounded-full bg-[#adf1dc] text-[#002019] text-xs font-bold hover:scale-105 active:scale-95 transition cursor-pointer shadow-xs flex items-center gap-1.5"
+                  className="px-4 py-1.5 rounded-full bg-[var(--theme-accent,#adf1dc)] text-[#002019] text-xs font-bold hover:scale-105 active:scale-95 transition cursor-pointer shadow-xs flex items-center gap-1.5"
                 >
                   <img src="/lock_reset.png" alt="Lock Reset" className="w-4 h-4 object-contain inline-block" />
                   <span>Change Password</span>
@@ -297,22 +309,22 @@ export default function ProfileModal({
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div
             className={`p-3.5 rounded-2xl border text-center ${
-              isDark ? "bg-[#161b1a] border-white/5" : "bg-[#f1fcf4] border-black/5"
+              isDark ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5" : "bg-[var(--theme-bg-light,#f1fcf4)] border-black/5"
             }`}
           >
             <div className="text-xs opacity-60 font-medium mb-1">Total Tasks Finished</div>
-            <div className="text-2xl font-black text-[#256959] dark:text-[#adf1dc]">
+            <div className="text-2xl font-black text-[var(--theme-deep,#256959)] dark:text-[var(--theme-accent,#adf1dc)]">
               {totalTasksFinished}
             </div>
           </div>
 
           <div
             className={`p-3.5 rounded-2xl border text-center ${
-              isDark ? "bg-[#161b1a] border-white/5" : "bg-[#f1fcf4] border-black/5"
+              isDark ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5" : "bg-[var(--theme-bg-light,#f1fcf4)] border-black/5"
             }`}
           >
             <div className="text-xs opacity-60 font-medium mb-1">Total Tasks</div>
-            <div className="text-2xl font-black text-[#256959] dark:text-[#adf1dc]">
+            <div className="text-2xl font-black text-[var(--theme-deep,#256959)] dark:text-[var(--theme-accent,#adf1dc)]">
               {tasks.length}
             </div>
           </div>
@@ -322,7 +334,7 @@ export default function ProfileModal({
         {!isGuest && (
           <div
             className={`rounded-2xl p-5 border ${
-              isDark ? "bg-[#161b1a] border-white/5" : "bg-[#ebf6ef]/60 border-black/5"
+              isDark ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5" : "bg-[var(--theme-subtle-light,#ebf6ef)]/60 border-black/5"
             }`}
           >
             <div className="flex flex-col items-center justify-center gap-3 mb-5">
@@ -334,30 +346,41 @@ export default function ProfileModal({
                 </span>
               </div>
 
+              {/* Liquid Sliding Pill for Day / Week / Month Switcher */}
               <div
                 className={`inline-flex p-1 rounded-full border ${
                   isDark ? "bg-[#1f2725] border-white/5" : "bg-white border-black/5"
                 }`}
               >
-                {(["day", "week", "month"] as TimeFilter[]).map((f) => (
-                  <button
-                    key={f}
-                    type="button"
-                    onClick={() => {
-                      setTimeFilter(f);
-                      setSelectedDateStr(null);
-                    }}
-                    className={`px-4 py-1 rounded-full text-xs font-semibold capitalize transition cursor-pointer ${
-                      timeFilter === f
-                        ? "bg-[#adf1dc] text-[#002019] shadow-sm font-bold"
-                        : isDark
-                          ? "text-slate-400 hover:text-white"
-                          : "text-slate-600 hover:text-black"
-                    }`}
-                  >
-                    {f}
-                  </button>
-                ))}
+                {(["day", "week", "month"] as TimeFilter[]).map((f) => {
+                  const isSelected = timeFilter === f;
+                  return (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => {
+                        setTimeFilter(f);
+                        setSelectedDateStr(null);
+                      }}
+                      className={`relative px-4 py-1 rounded-full text-xs font-semibold capitalize transition-colors cursor-pointer z-10 ${
+                        isSelected
+                          ? "text-[#002019] font-bold"
+                          : isDark
+                            ? "text-slate-400 hover:text-white"
+                            : "text-slate-600 hover:text-black"
+                      }`}
+                    >
+                      {isSelected && (
+                        <motion.div
+                          layoutId="profile-time-filter-pill"
+                          transition={{ type: "spring", stiffness: 420, damping: 28 }}
+                          className="absolute inset-0 rounded-full bg-[var(--theme-accent,#adf1dc)] shadow-xs -z-10"
+                        />
+                      )}
+                      <span className="relative z-10">{f}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -388,19 +411,42 @@ export default function ProfileModal({
             />
           </div>
         )}
-      </div>
 
-      {/* Confirmation Modal */}
-      <LogoutConfirmModal
-        isOpen={showLogoutConfirm}
-        isDark={isDark}
-        isGuest={isGuest}
-        onConfirm={() => {
-          setShowLogoutConfirm(false);
-          handleLogoutAction();
-        }}
-        onCancel={() => setShowLogoutConfirm(false)}
-      />
-    </div>
+        {/* Feedback Report Link - Lowest part of Profile */}
+        <div className="mt-5 pt-4 border-t border-black/5 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 opacity-70 text-center sm:text-left">
+            <span className="material-symbols-outlined text-[17px] text-[var(--theme-deep,#256959)] dark:text-[var(--theme-accent,#adf1dc)]">
+              feedback
+            </span>
+            <span>Have thoughts or suggestions? Help us improve Pomo.</span>
+          </div>
+
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSfQSmSpRq2ktqC6v1DEUR7Q_SX-pzpOzaAQCB-wt1beoYCAxw/viewform?usp=sharing&ouid=117819124999316855756"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Give Feedback (Opens Google Form in a new tab)"
+            className="flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-bold text-xs bg-[var(--theme-accent,#adf1dc)] text-[#002019] hover:opacity-90 hover:scale-105 active:scale-95 transition shadow-xs cursor-pointer"
+          >
+            <span>Feedback Report</span>
+            <img src="/arrow_forward.png" alt="" className="w-3.5 h-3.5 object-contain" />
+          </a>
+        </div>
+          </motion.div>
+
+          {/* Confirmation Modal */}
+          <LogoutConfirmModal
+            isOpen={showLogoutConfirm}
+            isDark={isDark}
+            isGuest={isGuest}
+            onConfirm={() => {
+              setShowLogoutConfirm(false);
+              handleLogoutAction();
+            }}
+            onCancel={() => setShowLogoutConfirm(false)}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

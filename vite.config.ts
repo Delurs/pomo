@@ -15,6 +15,9 @@ export default defineConfig({
           if (id.includes('@supabase')) {
             return 'supabase';
           }
+          if (id.includes('motion') || id.includes('@animate-ui') || id.includes('@floating-ui')) {
+            return 'motion';
+          }
         },
       },
     },
