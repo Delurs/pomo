@@ -16,6 +16,12 @@ Live Production URL: [https://pomodoro-tortoise.vercel.app](https://pomodoro-tor
 
 ---
 
+## 🎬 Product Walkthrough
+
+https://github.com/user-attachments/assets/d33f2f73-e6d4-405d-b037-99c7ed85494c
+
+---
+
 ## ✨ Key Features & User Experience
 
 ### ⏱️ Adaptive Ritual Timer
