@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router";
 import { supabase } from "./lib/supabaseClient";
 import type { Task } from "./types/pomo";
 import Header from "./components/Header";
@@ -7,11 +8,15 @@ import TaskListCard from "./components/TaskListCard";
 import MusicPlayerCard from "./components/MusicPlayerCard";
 import NewTaskModal from "./components/NewTaskModal";
 import ProfileModal from "./components/ProfileModal";
-import LoginPage from "./components/LoginPage";
 import ResetPasswordPage from "./components/ResetPasswordPage";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import { type ThemeColor, THEME_COLORS } from "./types/themeColors";
 
-export default function App() {
+function AppRoutes() {
+  const navigate = useNavigate();
+
   const [isDark, setIsDark] = useState<boolean>(false);
   const [colorTheme, setColorTheme] = useState<ThemeColor>(() => {
     return (localStorage.getItem("pomo_theme_color") as ThemeColor) || "green";
@@ -45,8 +50,12 @@ export default function App() {
 
   // AUTH STATE
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [_userName, setUserName] = useState<string>("Mindful Sprout");
+  const [userId, setUserId] = useState<string | null>(() => {
+    return localStorage.getItem("pomo_user_id") || "guest";
+  });
+  const [_userName, setUserName] = useState<string>(() => {
+    return localStorage.getItem("pomo_user_name") || "Mindful Guest";
+  });
   const [isPasswordRecovery, setIsPasswordRecovery] = useState<boolean>(() => {
     return (
       window.location.hash.includes("type=recovery") ||
@@ -79,13 +88,10 @@ export default function App() {
         localStorage.setItem("pomo_user_name", name);
         localStorage.setItem("pomo_user_id", session.user.id);
       } else {
-        const savedId = localStorage.getItem("pomo_user_id");
-        if (savedId === "guest") {
-          setIsAuthenticated(true);
-          setUserId("guest");
-          const name = localStorage.getItem("pomo_user_name") || "Mindful Guest";
-          setUserName(name);
-        }
+        setIsAuthenticated(false);
+        setUserId("guest");
+        const name = localStorage.getItem("pomo_user_name") || "Mindful Guest";
+        setUserName(name);
       }
     });
 
@@ -103,12 +109,8 @@ export default function App() {
         localStorage.setItem("pomo_user_name", name);
         localStorage.setItem("pomo_user_id", session.user.id);
       } else {
-        const savedId = localStorage.getItem("pomo_user_id");
-        if (savedId !== "guest") {
-          setIsAuthenticated(false);
-          setUserId(null);
-          setTasks([]);
-        }
+        setIsAuthenticated(false);
+        setUserId("guest");
       }
     });
 
@@ -117,7 +119,7 @@ export default function App() {
 
   // 2. FETCH TASKS ON LOGIN / USER CHANGE
   const fetchTasks = useCallback(async (uid: string) => {
-    if (uid === "guest") {
+    if (!uid || uid === "guest") {
       const saved = localStorage.getItem("pomo_guest_tasks");
       if (saved) {
         try {
@@ -125,6 +127,8 @@ export default function App() {
         } catch {
           setTasks([]);
         }
+      } else {
+        setTasks([]);
       }
       return;
     }
@@ -160,9 +164,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (userId) {
-      fetchTasks(userId);
-    }
+    fetchTasks(userId || "guest");
   }, [userId, fetchTasks]);
 
   const handleLogin = (name: string, id: string) => {
@@ -170,21 +172,21 @@ export default function App() {
     setUserId(id);
     localStorage.setItem("pomo_user_name", name);
     localStorage.setItem("pomo_user_id", id);
-    setIsAuthenticated(true);
+    setIsAuthenticated(id !== "guest");
   };
 
   const handleLogout = async () => {
-    if (userId !== "guest") {
+    if (userId && userId !== "guest") {
       await supabase.auth.signOut();
     }
     localStorage.removeItem("pomo_is_logged_in");
     sessionStorage.removeItem("pomo_is_logged_in");
-    localStorage.removeItem("pomo_user_id");
-    localStorage.removeItem("pomo_user_name");
+    localStorage.setItem("pomo_user_id", "guest");
+    localStorage.setItem("pomo_user_name", "Mindful Guest");
     setIsAuthenticated(false);
-    setUserId(null);
-    setTasks([]);
+    setUserId("guest");
     setIsProfileOpen(false);
+    navigate("/login");
   };
 
   // 3. TASK HANDLERS WITH SUPABASE PERSISTENCE
@@ -200,10 +202,8 @@ export default function App() {
   };
 
   const handleCreateDetailedTask = async (newTask: Task) => {
-    // 1. Optimistic Update (shows immediately)
     setTasks((prev) => [newTask, ...prev]);
 
-    // 2. Persist to Supabase
     if (userId && userId !== "guest") {
       const { error } = await supabase.from("tasks").insert({
         id: newTask.id,
@@ -407,37 +407,34 @@ export default function App() {
         onComplete={async () => {
           setIsPasswordRecovery(false);
           window.history.replaceState(null, "", window.location.pathname);
-          const { data: { session } } = await supabase.auth.getSession();
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
           if (session) {
             setIsAuthenticated(true);
             setUserId(session.user.id);
-            setUserName(session.user.user_metadata?.username || "Mindful Sprout");
+            setUserName(
+              session.user.user_metadata?.username || "Mindful Sprout"
+            );
           }
+          navigate("/app");
         }}
         onLater={async () => {
           await supabase.auth.signOut();
           setIsPasswordRecovery(false);
           setIsAuthenticated(false);
-          setUserId(null);
+          setUserId("guest");
           window.history.replaceState(null, "", window.location.pathname);
+          navigate("/login");
         }}
       />
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <LoginPage
-        isDark={isDark}
-        setIsDark={setIsDark}
-        onLogin={handleLogin}
-      />
-    );
-  }
-
   const currentTheme = THEME_COLORS[colorTheme] || THEME_COLORS.green;
+  const isGuestUser = !isAuthenticated || userId === "guest";
 
-  return (
+  const workspaceElement = (
     <div
       style={{
         backgroundColor: isDark ? currentTheme.bgDark : currentTheme.bgLight,
@@ -454,6 +451,7 @@ export default function App() {
         onSelectColor={setColorTheme}
         completedSessions={totalSessions}
         onOpenProfile={() => setIsProfileOpen(true)}
+        isGuest={isGuestUser}
       />
 
       {/* Main Bento Grid */}
@@ -465,7 +463,9 @@ export default function App() {
               isDark={isDark}
               completedSessions={taskCompletedSessions}
               targetSessions={targetSessions}
-              activeTaskTitle={activeTask ? `🎯 ${activeTask.title}` : undefined}
+              activeTaskTitle={
+                activeTask ? `🎯 ${activeTask.title}` : undefined
+              }
               startTimerSignal={startTimerSignal}
               stopTimerSignal={stopTimerSignal}
               onSessionComplete={handleSessionComplete}
@@ -493,7 +493,10 @@ export default function App() {
               onOpenDetailedModal={handleOpenTaskModal}
             />
 
-            <MusicPlayerCard isDark={isDark} stopMusicSignal={stopMusicSignal} />
+            <MusicPlayerCard
+              isDark={isDark}
+              stopMusicSignal={stopMusicSignal}
+            />
           </div>
         </div>
       </main>
@@ -520,7 +523,7 @@ export default function App() {
         tasks={tasks}
         completedSessions={totalSessions}
         onLogout={handleLogout}
-        isGuest={userId === "guest"}
+        isGuest={isGuestUser}
       />
 
       {/* Minimal Relaxed Footer */}
@@ -529,10 +532,59 @@ export default function App() {
         <img
           src="/logo-name.png"
           alt="Pomodoro Tortoise"
-          className={`h-4 object-contain opacity-80 ${isDark ? "brightness-[2] contrast-125" : ""}`}
+          className={`h-4 object-contain opacity-80 ${
+            isDark ? "brightness-[2] contrast-125" : ""
+          }`}
         />
         <span> Crafted for quiet minds</span>
       </footer>
     </div>
+  );
+
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <LandingPage
+            isDark={isDark}
+            setIsDark={setIsDark}
+            isAuthenticated={isAuthenticated}
+          />
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <LoginPage
+            isDark={isDark}
+            setIsDark={setIsDark}
+            onLogin={handleLogin}
+            isAuthenticated={isAuthenticated}
+          />
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <RegisterPage
+            isDark={isDark}
+            setIsDark={setIsDark}
+            onLogin={handleLogin}
+            isAuthenticated={isAuthenticated}
+          />
+        }
+      />
+      <Route path="/app" element={workspaceElement} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }

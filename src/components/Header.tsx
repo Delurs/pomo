@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
     type ThemeColor,
@@ -16,6 +17,7 @@ interface HeaderProps {
     onOpenProfile?: () => void;
     currentColor?: ThemeColor;
     onSelectColor?: (color: ThemeColor) => void;
+    isGuest?: boolean;
 }
 
 export default function Header({
@@ -25,6 +27,7 @@ export default function Header({
     onOpenProfile,
     currentColor = "green",
     onSelectColor,
+    isGuest = false,
 }: HeaderProps) {
     const [isColorMenuOpen, setIsColorMenuOpen] = useState(false);
     const colorMenuRef = useRef<HTMLDivElement>(null);
@@ -63,28 +66,49 @@ export default function Header({
             className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl border-b transition-colors border-black/5 dark:border-white/5"
         >
             <div className="h-16 max-w-[1280px] mx-auto px-3 sm:px-6 flex items-center justify-between gap-2">
-                {/* Brand Logo & Title (Bouncy spring hover/tap physics) */}
-                <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.96 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                {/* Brand Logo & Title (Routes back to / Landing Page) */}
+                <Link
+                    to="/"
+                    title="Return to Landing Page"
                     className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 cursor-pointer select-none"
                 >
-                    <img
-                        src="/logo.png"
-                        alt="Pomodoro Tortoise Logo"
-                        className="w-8 h-8 sm:w-11 sm:h-11 object-contain drop-shadow-sm transition-transform"
-                    />
-                    <img
-                        src="/logo-name.png"
-                        alt="Pomodoro Tortoise"
-                        className={`h-4.5 sm:h-6 object-contain transition-all ${isDark ? "brightness-[2.2] contrast-125" : ""
-                            }`}
-                    />
-                </motion.div>
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                        className="flex items-center gap-2 sm:gap-2.5"
+                    >
+                        <img
+                            src="/logo.png"
+                            alt="Pomodoro Tortoise Logo"
+                            className="w-8 h-8 sm:w-11 sm:h-11 object-contain drop-shadow-sm transition-transform"
+                        />
+                        <img
+                            src="/logo-name.png"
+                            alt="Pomodoro Tortoise"
+                            className={`h-4.5 sm:h-6 object-contain transition-all ${isDark ? "brightness-[2.2] contrast-125" : ""
+                                }`}
+                        />
+                    </motion.div>
+                </Link>
 
-                {/* Right Controls: Theme Toggle, Collapsible Color Button, & Profile Button */}
+                {/* Right Controls: Sign In to Sync (Guest), Theme Toggle, Color Button, & Profile Button */}
                 <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+                    {isGuest && (
+                        <Link
+                            to="/login"
+                            title="Sign in to synchronize your tasks and analytics across devices"
+                            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#ADF1DC] text-[#002019] shadow-xs hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
+                        >
+                            <img
+                                src="/login.png"
+                                alt=""
+                                className="w-3.5 h-3.5 object-contain"
+                            />
+                            <span>Sign In to Sync</span>
+                        </Link>
+                    )}
+
                     {/* Animated Theme Toggler Button */}
                     <ThemeTogglerButton
                         isDark={isDark}
@@ -152,7 +176,7 @@ export default function Header({
                         </AnimatePresence>
                     </div>
 
-                    {/* Profile Button beside the right side of color button (bouncy spring hover/tap physics) */}
+                    {/* Profile Button beside the right side of color button */}
                     <motion.button
                         type="button"
                         onClick={onOpenProfile}
