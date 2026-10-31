@@ -1,6 +1,5 @@
 import { Link } from "react-router";
 import { motion } from "motion/react";
-import { ThemeTogglerButton } from "../components/ui/FluidAnimations";
 
 export interface LandingPageProps {
   isDark: boolean;
@@ -52,7 +51,6 @@ const FEATURES = [
 
 export default function LandingPage({
   isDark,
-  setIsDark,
   isAuthenticated = false,
 }: LandingPageProps) {
   return (
@@ -91,11 +89,6 @@ export default function LandingPage({
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <ThemeTogglerButton
-              isDark={isDark}
-              onToggle={() => setIsDark(!isDark)}
-            />
-
             <Link
               to="/login"
               className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-bold border transition-all ${
@@ -112,7 +105,6 @@ export default function LandingPage({
               className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[#ADF1DC] text-[#002019] shadow-xs hover:brightness-95 transition"
             >
               <span>Enter as guest</span>
-              <span>→</span>
             </Link>
           </div>
         </div>
