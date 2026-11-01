@@ -168,8 +168,8 @@ export default function ProfileModal({
               isGuest ? "max-w-xl" : "max-w-3xl"
             } max-h-[92vh] overflow-y-auto rounded-3xl p-6 md:p-8 border shadow-2xl relative transition-colors duration-200 ${
               isDark
-                ? "bg-[#1f2725] border-white/10 text-[#e8f3ec]"
-                : "bg-white border-black/5 text-[#141e19]"
+                ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 text-[#e8f3ec]"
+                : "bg-[var(--theme-card-light,#ffffff)] border-black/5 text-[#141e19]"
             }`}
           >
             {/* Modal Header */}
@@ -228,7 +228,7 @@ export default function ProfileModal({
                       autoFocus
                       className={`px-3 py-1 text-sm font-bold rounded-lg border focus:outline-none text-center sm:text-left w-40 ${
                         isDark
-                          ? "bg-[#1f2725] border-white/20 text-white"
+                          ? "bg-[var(--theme-card-dark,#1f2725)] border-white/20 text-white"
                           : "bg-white border-black/20 text-black"
                       }`}
                     />
@@ -349,7 +349,7 @@ export default function ProfileModal({
               {/* Liquid Sliding Pill for Day / Week / Month Switcher */}
               <div
                 className={`inline-flex p-1 rounded-full border ${
-                  isDark ? "bg-[#1f2725] border-white/5" : "bg-white border-black/5"
+                  isDark ? "bg-[var(--theme-card-dark,#1f2725)] border-white/5" : "bg-white border-black/5"
                 }`}
               >
                 {(["day", "week", "month"] as TimeFilter[]).map((f) => {

@@ -55,7 +55,7 @@ export default function ProfileTaskList({
               <div
                 key={t.id}
                 className={`p-2.5 rounded-xl border text-xs flex items-center justify-between gap-3 ${
-                  isDark ? "bg-[#1f2725] border-white/5" : "bg-white border-black/5 shadow-2xs"
+                  isDark ? "bg-[var(--theme-card-dark,#1f2725)] border-white/5" : "bg-white border-black/5 shadow-2xs"
                 }`}
               >
                 <div className="flex items-center gap-2.5 truncate">

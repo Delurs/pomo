@@ -129,8 +129,8 @@ export function ThemeTogglerButton({
       title={title}
       className={`relative w-8 h-8 sm:w-9 sm:h-9 rounded-full border flex items-center justify-center cursor-pointer transition-colors shadow-xs select-none flex-shrink-0 overflow-hidden ${
         isDark
-          ? "bg-[#1f2725] border-white/10 text-[var(--theme-accent,#adf1dc)] hover:border-white/25"
-          : "bg-white border-black/5 text-[var(--theme-deep,#256959)] hover:border-black/15 shadow-sm"
+          ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 text-[var(--theme-accent,#adf1dc)] hover:border-white/25"
+          : "bg-[var(--theme-card-light,#ffffff)] border-black/5 text-[var(--theme-deep,#256959)] hover:border-black/15 shadow-sm"
       } ${className}`}
     >
       <AnimatePresence initial={false}>
@@ -199,7 +199,7 @@ export function AvatarGroupColorPicker({
                   transition={{ type: "spring", stiffness: 400, damping: 29 }}
                   className={`absolute -top-7.5 z-30 pointer-events-none px-2 py-0.5 rounded-md text-[10px] font-semibold whitespace-nowrap shadow-md flex items-center justify-center ${
                     isDark
-                      ? "bg-[#141e19] text-white border border-white/15 shadow-black/40"
+                      ? "bg-[var(--theme-bg-dark,#141e19)] text-white border border-white/15 shadow-black/40"
                       : "bg-white text-[#141e19] border border-black/10 shadow-black/10"
                   }`}
                 >
@@ -211,7 +211,7 @@ export function AvatarGroupColorPicker({
                   <div
                     className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 border-r border-b ${
                       isDark
-                        ? "bg-[#141e19] border-white/15"
+                        ? "bg-[var(--theme-bg-dark,#141e19)] border-white/15"
                         : "bg-white border-black/10"
                     }`}
                   />
@@ -243,7 +243,7 @@ export function AvatarGroupColorPicker({
                 isSelected
                   ? "ring-2 ring-offset-2 ring-[var(--theme-deep,#256959)] dark:ring-white shadow-sm"
                   : "opacity-80 hover:opacity-100 ring-1 ring-black/10 dark:ring-white/20"
-              } ${isDark ? "ring-offset-[#1f2725]" : "ring-offset-white"}`}
+              } ${isDark ? "ring-offset-[var(--theme-card-dark,#1f2725)]" : "ring-offset-white"}`}
               style={{
                 backgroundColor: config.dotColor,
               }}

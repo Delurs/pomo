@@ -90,7 +90,7 @@ export default function TaskListCard({
 
     return (
         <section
-            className={`w-full h-[220px] sm:h-[230px] flex-shrink-0 rounded-2xl p-3 border shadow-sm transition-colors flex flex-col justify-between overflow-hidden ${isDark ? "bg-[#1f2725] border-white/5" : "bg-white border-black/5"
+            className={`w-full h-[220px] sm:h-[230px] flex-shrink-0 rounded-2xl p-3 border shadow-sm transition-colors flex flex-col justify-between overflow-hidden ${isDark ? "bg-[var(--theme-card-dark,#1f2725)] border-white/5" : "bg-[var(--theme-card-light,#ffffff)] border-black/5"
                 }`}
         >
             {/* Top Header & Quick Add */}
@@ -227,7 +227,7 @@ export default function TaskListCard({
                                                         onToggleTask(task.id);
                                                     }}
                                                     className={`w-4 h-4 rounded-full flex items-center justify-center transition flex-shrink-0 cursor-pointer group/chk ${isDark
-                                                            ? "bg-[#29332e] hover:border-[var(--theme-accent,#adf1dc)]/50 border border-white/15"
+                                                            ? "bg-[var(--theme-card-dark,#1f2725)] hover:border-[var(--theme-accent,#adf1dc)]/50 border border-white/15"
                                                             : "bg-white hover:border-[var(--theme-accent,#adf1dc)] border border-black/20"
                                                         }`}
                                                 >
@@ -328,10 +328,10 @@ export default function TaskListCard({
                                                         e.stopPropagation();
                                                         onEditTask(task);
                                                     }}
-                                                    className="opacity-70 hover:opacity-100 hover:text-[var(--theme-deep,#256959)] dark:hover:text-[var(--theme-accent,#adf1dc)] p-0.5 transition cursor-pointer"
+                                                    className="opacity-75 hover:opacity-100 hover:scale-110 hover:text-[var(--theme-deep,#256959)] dark:hover:text-[var(--theme-accent,#adf1dc)] p-1 transition cursor-pointer"
                                                     title="Edit task"
                                                 >
-                                                    <img src="/edit.png" alt="Edit" className="w-3.5 h-3.5 object-contain" />
+                                                    <img src="/edit.png" alt="Edit" className="w-4.5 h-4.5 sm:w-5 sm:h-5 object-contain" />
                                                 </button>
 
                                                 {/* Delete Button */}
@@ -341,10 +341,10 @@ export default function TaskListCard({
                                                         e.stopPropagation();
                                                         onDeleteTask(task.id);
                                                     }}
-                                                    className="opacity-70 hover:opacity-100 hover:text-red-400 p-0.5 transition cursor-pointer"
+                                                    className="opacity-75 hover:opacity-100 hover:scale-110 hover:text-red-400 p-1 transition cursor-pointer"
                                                     title="Delete task"
                                                 >
-                                                    <img src="/close.png" alt="Delete" className="w-3.5 h-3.5 object-contain" />
+                                                    <img src="/close.png" alt="Delete" className="w-4.5 h-4.5 sm:w-5 sm:h-5 object-contain" />
                                                 </button>
                                             </div>
                                         </div>
@@ -475,10 +475,10 @@ export default function TaskListCard({
                                                         <button
                                                             type="button"
                                                             onClick={() => onDeleteTask(task.id)}
-                                                            className="opacity-50 hover:opacity-100 hover:text-red-400 p-0.5 transition cursor-pointer"
+                                                            className="opacity-65 hover:opacity-100 hover:scale-110 hover:text-red-400 p-1 transition cursor-pointer"
                                                             title="Delete completed task"
                                                         >
-                                                            <img src="/close.png" alt="Delete" className="w-3.5 h-3.5 object-contain" />
+                                                            <img src="/close.png" alt="Delete" className="w-4.5 h-4.5 sm:w-5 sm:h-5 object-contain" />
                                                         </button>
                                                     </div>
                                                 </motion.li>

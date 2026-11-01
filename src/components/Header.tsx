@@ -65,47 +65,49 @@ export default function Header({
             }}
             className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl border-b transition-colors border-black/5 dark:border-white/5"
         >
-            <div className="h-16 max-w-[1280px] mx-auto px-3 sm:px-6 flex items-center justify-between gap-2">
+            <div className="h-14 sm:h-16 max-w-[1280px] mx-auto px-2.5 sm:px-6 flex items-center justify-between gap-1.5 sm:gap-2">
                 {/* Brand Logo & Title (Routes back to / Landing Page) */}
                 <Link
                     to="/"
                     title="Return to Landing Page"
-                    className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 cursor-pointer select-none"
+                    className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-shrink cursor-pointer select-none"
                 >
                     <motion.div
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.96 }}
                         transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                        className="flex items-center gap-2 sm:gap-2.5"
+                        className="flex items-center gap-1.5 sm:gap-2.5 min-w-0"
                     >
                         <img
                             src="/logo.png"
                             alt="Pomodoro Tortoise Logo"
-                            className="w-8 h-8 sm:w-11 sm:h-11 object-contain drop-shadow-sm transition-transform"
+                            className="w-7 h-7 sm:w-11 sm:h-11 object-contain drop-shadow-sm flex-shrink-0 transition-transform"
                         />
                         <img
                             src="/logo-name.png"
                             alt="Pomodoro Tortoise"
-                            className={`h-4.5 sm:h-6 object-contain transition-all ${isDark ? "brightness-[2.2] contrast-125" : ""
-                                }`}
+                            className={`h-3.5 min-[390px]:h-4 sm:h-6 w-auto max-w-[96px] min-[390px]:max-w-[120px] sm:max-w-none object-contain transition-all ${
+                                isDark ? "brightness-[2.2] contrast-125" : ""
+                            }`}
                         />
                     </motion.div>
                 </Link>
 
                 {/* Right Controls: Sign In to Sync (Guest), Theme Toggle, Color Button, & Profile Button */}
-                <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+                <div className="flex items-center gap-1 sm:gap-2.5 flex-shrink-0">
                     {isGuest && (
                         <Link
                             to="/login"
                             title="Sign in to synchronize your tasks and analytics across devices"
-                            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#ADF1DC] text-[#002019] shadow-xs hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
+                            className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold bg-[var(--theme-accent,#adf1dc)] text-[#002019] shadow-xs hover:scale-105 active:scale-95 transition-all flex-shrink-0"
                         >
                             <img
                                 src="/login.png"
                                 alt=""
-                                className="w-3.5 h-3.5 object-contain"
+                                className="w-3 h-3 sm:w-3.5 sm:h-3.5 object-contain flex-shrink-0"
                             />
-                            <span>Sign In to Sync</span>
+                            <span className="sm:hidden">Sign In</span>
+                            <span className="hidden sm:inline">Sign In to Sync</span>
                         </Link>
                     )}
 
@@ -126,10 +128,11 @@ export default function Header({
                             aria-expanded={isColorMenuOpen}
                             aria-label={`Theme color options, currently ${THEME_COLORS[currentColor]?.label || "Green"}`}
                             title={`Theme color (${THEME_COLORS[currentColor]?.label || "Green"}) - click to change`}
-                            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full border transition-colors duration-150 cursor-pointer flex-shrink-0 ${isDark
-                                ? "bg-[#1f2725] border-white/10 hover:border-white/25 text-[#e8f3ec]"
-                                : "bg-white border-black/5 hover:border-black/15 text-[#141e19] shadow-sm"
-                                } ${isColorMenuOpen ? "ring-2 ring-[var(--theme-accent,#adf1dc)]/70 shadow-sm" : ""}`}
+                            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border transition-colors duration-150 cursor-pointer flex-shrink-0 ${
+                                isDark
+                                    ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 hover:border-white/25 text-[#e8f3ec]"
+                                    : "bg-[var(--theme-card-light,#ffffff)] border-black/5 hover:border-black/15 text-[#141e19] shadow-sm"
+                            } ${isColorMenuOpen ? "ring-2 ring-[var(--theme-accent,#adf1dc)]/70 shadow-sm" : ""}`}
                         >
                             {/* Color Dot Preview */}
                             <span
@@ -144,8 +147,9 @@ export default function Header({
                             <img
                                 src={isColorMenuOpen ? "/chevron_up.png" : "/chevron_down.png"}
                                 alt=""
-                                className={`w-3 h-3 object-contain opacity-60 transition-transform ${isDark ? "brightness-200 invert" : ""
-                                    }`}
+                                className={`w-2.5 h-2.5 sm:w-3 sm:h-3 object-contain opacity-60 transition-transform ${
+                                    isDark ? "brightness-200 invert" : ""
+                                }`}
                             />
                         </motion.button>
 
@@ -157,10 +161,11 @@ export default function Header({
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.92, y: -4 }}
                                     transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                                    className={`absolute top-full right-0 mt-2 z-50 rounded-2xl border shadow-xl flex items-center ${isDark
-                                        ? "bg-[#1f2725] border-white/15 shadow-black/50"
-                                        : "bg-white border-black/10 shadow-black/10"
-                                        }`}
+                                    className={`fixed sm:absolute top-14 sm:top-full right-2 sm:right-0 sm:mt-2 z-50 rounded-2xl border shadow-xl flex items-center ${
+                                        isDark
+                                            ? "bg-[var(--theme-card-dark,#1f2725)] border-white/15 shadow-black/50"
+                                            : "bg-[var(--theme-card-light,#ffffff)] border-black/10 shadow-black/10"
+                                    }`}
                                 >
                                     <AvatarGroupColorPicker
                                         currentColor={currentColor}
@@ -185,10 +190,11 @@ export default function Header({
                         transition={{ type: "spring", stiffness: 500, damping: 20 }}
                         aria-label="Open Profile and Focus Analytics"
                         title="Profile & Analytics"
-                        className={`flex items-center gap-1.5 pl-1 sm:pl-1.5 pr-2 sm:pr-3 py-1 rounded-full border transition-colors duration-150 cursor-pointer flex-shrink-0 ${isDark
-                            ? "bg-[#1f2725] border-white/10 hover:border-white/20 hover:bg-[#29332e] text-[#e8f3ec]"
-                            : "bg-white border-black/5 hover:border-black/15 hover:bg-[#f1fcf4] text-[#141e19] shadow-sm"
-                            }`}
+                        className={`flex items-center gap-1.5 p-1 sm:pl-1.5 sm:pr-3 sm:py-1 rounded-full border transition-colors duration-150 cursor-pointer flex-shrink-0 ${
+                            isDark
+                                ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 hover:border-white/20 hover:bg-[var(--theme-active-dark,#162720)] text-[#e8f3ec]"
+                                : "bg-[var(--theme-card-light,#ffffff)] border-black/5 hover:border-black/15 hover:bg-[var(--theme-bg-light,#f1fcf4)] text-[#141e19] shadow-sm"
+                        }`}
                     >
                         <div className="relative">
                             <div

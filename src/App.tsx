@@ -17,12 +17,15 @@ import { type ThemeColor, THEME_COLORS } from "./types/themeColors";
 function AppRoutes() {
   const navigate = useNavigate();
 
-  const [isDark, setIsDark] = useState<boolean>(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    return localStorage.getItem("pomo_dark_mode") === "true";
+  });
   const [colorTheme, setColorTheme] = useState<ThemeColor>(() => {
     return (localStorage.getItem("pomo_theme_color") as ThemeColor) || "green";
   });
 
   useEffect(() => {
+    localStorage.setItem("pomo_dark_mode", String(isDark));
     if (isDark) {
       document.documentElement.classList.add("dark");
     } else {

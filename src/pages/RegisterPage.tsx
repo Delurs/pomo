@@ -119,22 +119,27 @@ export default function RegisterPage({
     navigate("/app");
   };
 
-  const floatingInputClass = `peer w-full h-10 rounded-xl px-3.5 pt-4 pb-1 text-xs border focus:outline-none focus:ring-2 focus:ring-[#ADF1DC] focus:border-[#ADF1DC] transition-all placeholder-transparent ${
+  const floatingInputClass = `peer w-full h-10 rounded-xl px-3.5 pt-4 pb-1 text-xs border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#ADF1DC)] focus:border-[var(--theme-accent,#ADF1DC)] transition-all placeholder-transparent ${
     isDark
-      ? "bg-[#161b1a]/90 border-white/10 text-[#e8f3ec]"
+      ? "bg-[var(--theme-subtle-dark,#161b1a)]/90 border-white/10 text-[#e8f3ec]"
       : "bg-white border-black/10 text-[#141e19]"
   }`;
 
   const floatingLabelClass = `absolute left-3.5 top-1.5 text-[9px] font-semibold tracking-wide transition-all pointer-events-none peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-xs peer-focus:top-1 peer-focus:text-[9px] ${
     isDark
-      ? "text-[#e8f3ec]/55 peer-focus:text-[#ADF1DC]"
-      : "text-[#141e19]/55 peer-focus:text-[#256959]"
+      ? "text-[#e8f3ec]/55 peer-focus:text-[var(--theme-accent,#ADF1DC)]"
+      : "text-[#141e19]/55 peer-focus:text-[var(--theme-deep,#256959)]"
   }`;
 
   return (
     <div
+      style={{
+        backgroundColor: isDark
+          ? "var(--theme-bg-dark, #141E19)"
+          : "var(--theme-bg-light, #FAF9F6)",
+      }}
       className={`h-screen w-full flex relative overflow-hidden transition-colors duration-300 ${
-        isDark ? "bg-[#141E19] text-[#e8f3ec]" : "bg-[#FAF9F6] text-[#141e19]"
+        isDark ? "text-[#e8f3ec]" : "text-[#141e19]"
       }`}
     >
       {/* Left 50% Split-Screen Sanctuary Showcase */}
@@ -143,7 +148,7 @@ export default function RegisterPage({
       {/* Right 50% Form Area */}
       <main className="w-full lg:w-1/2 h-screen flex items-center justify-center px-4 sm:px-6 relative z-10">
         {/* Subtle Ambient Glow behind Card */}
-        <div className="pointer-events-none absolute w-80 h-80 rounded-full bg-[#ADF1DC]/20 blur-3xl" />
+        <div className="pointer-events-none absolute w-80 h-80 rounded-full bg-[var(--theme-accent,#ADF1DC)]/20 blur-3xl" />
 
         <motion.div
           initial={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -151,8 +156,8 @@ export default function RegisterPage({
           transition={{ duration: 0.3, ease: "easeOut" }}
           className={`w-full max-w-md rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all relative z-10 ${
             isDark
-              ? "bg-[#1f2725]/90 border-white/10 text-[#e8f3ec] shadow-black/40"
-              : "bg-white/95 border-black/8 text-[#141e19] shadow-[#256959]/10"
+              ? "bg-[var(--theme-card-dark,#1f2725)]/90 border-white/10 text-[#e8f3ec] shadow-black/40"
+              : "bg-white/95 border-black/8 text-[#141e19] shadow-[var(--theme-deep,#256959)]/10"
           }`}
         >
           {/* Header & Mascot Badge */}
@@ -177,8 +182,8 @@ export default function RegisterPage({
             aria-label="Authentication mode"
             className={`grid grid-cols-2 p-1 rounded-xl border mb-3 ${
               isDark
-                ? "bg-[#141E19]/90 border-white/10"
-                : "bg-[#f1fcf4] border-black/5"
+                ? "bg-[var(--theme-bg-dark,#141E19)]/90 border-white/10"
+                : "bg-[var(--theme-bg-light,#f1fcf4)] border-black/5"
             }`}
           >
             <button
@@ -200,7 +205,7 @@ export default function RegisterPage({
               type="button"
               role="tab"
               aria-selected={true}
-              className="py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 bg-[#ADF1DC] text-[#002019] shadow-sm"
+              className="py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 bg-[var(--theme-accent,#ADF1DC)] text-[#002019] shadow-sm"
             >
               <img
                 src="/person_add.png"
@@ -328,7 +333,7 @@ export default function RegisterPage({
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 500, damping: 20 }}
-              className="w-full py-2.5 rounded-xl bg-[#ADF1DC] text-[#002019] text-xs font-bold transition cursor-pointer shadow-md flex items-center justify-center gap-2 disabled:opacity-60 select-none"
+              className="w-full py-2.5 rounded-xl bg-[var(--theme-accent,#ADF1DC)] text-[#002019] text-xs font-bold transition cursor-pointer shadow-md flex items-center justify-center gap-2 disabled:opacity-60 select-none"
             >
               <img
                 src="/how_to_reg.png"
@@ -346,7 +351,7 @@ export default function RegisterPage({
             <button
               type="button"
               onClick={handleGuestMode}
-              className="w-full py-2 px-4 rounded-xl text-xs font-semibold border border-transparent hover:border-[#ADF1DC]/50 bg-black/[0.03] dark:bg-white/[0.04] hover:bg-[#ADF1DC]/15 transition cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-2 px-4 rounded-xl text-xs font-semibold border border-transparent hover:border-[var(--theme-accent,#ADF1DC)]/50 bg-black/[0.03] dark:bg-white/[0.04] hover:bg-[var(--theme-accent,#ADF1DC)]/15 transition cursor-pointer flex items-center justify-center gap-2"
             >
               <img
                 src="/spa.png"

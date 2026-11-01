@@ -55,20 +55,25 @@ export default function LandingPage({
 }: LandingPageProps) {
   return (
     <div
+      style={{
+        backgroundColor: isDark
+          ? "var(--theme-bg-dark, #141E19)"
+          : "var(--theme-bg-light, #FAF9F6)",
+      }}
       className={`min-h-screen w-full flex flex-col justify-between relative overflow-x-hidden transition-colors duration-300 ${
-        isDark ? "bg-[#141E19] text-[#e8f3ec]" : "bg-[#FAF9F6] text-[#141e19]"
+        isDark ? "text-[#e8f3ec]" : "text-[#141e19]"
       }`}
     >
       {/* Ambient Background Glows */}
-      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[48rem] h-[28rem] rounded-full bg-[#ADF1DC]/25 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 -right-40 w-[30rem] h-[30rem] rounded-full bg-[#256959]/15 blur-3xl" />
+      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[48rem] h-[28rem] rounded-full bg-[var(--theme-accent,#ADF1DC)]/25 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 -right-40 w-[30rem] h-[30rem] rounded-full bg-[var(--theme-deep,#256959)]/15 blur-3xl" />
 
       {/* Top Navigation Bar */}
       <header
         className={`sticky top-0 z-40 backdrop-blur-xl border-b transition-colors ${
           isDark
-            ? "bg-[#141E19]/80 border-white/5"
-            : "bg-[#FAF9F6]/80 border-black/5"
+            ? "bg-[var(--theme-bg-dark,#141E19)]/80 border-white/5"
+            : "bg-[var(--theme-bg-light,#FAF9F6)]/80 border-black/5"
         }`}
       >
         <div className="max-w-6xl mx-auto h-16 px-4 sm:px-6 flex items-center justify-between gap-3">
@@ -93,8 +98,8 @@ export default function LandingPage({
               to="/login"
               className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-bold border transition-all ${
                 isDark
-                  ? "bg-[#1f2725] border-white/10 text-[#e8f3ec] hover:border-[#ADF1DC]/40 hover:bg-[#26312e]"
-                  : "bg-white border-black/10 text-[#141e19] hover:border-black/20 hover:bg-[#f1fcf4] shadow-2xs"
+                  ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 text-[#e8f3ec] hover:border-[var(--theme-accent,#ADF1DC)]/40"
+                  : "bg-white border-black/10 text-[#141e19] hover:border-black/20 hover:bg-[var(--theme-bg-light,#f1fcf4)] shadow-2xs"
               }`}
             >
               {isAuthenticated ? "Account" : "Sign In"}
@@ -102,7 +107,7 @@ export default function LandingPage({
 
             <Link
               to="/app"
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[#ADF1DC] text-[#002019] shadow-xs hover:brightness-95 transition"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[var(--theme-accent,#ADF1DC)] text-[#002019] shadow-xs hover:brightness-95 transition"
             >
               <span>Enter as guest</span>
             </Link>
@@ -153,7 +158,9 @@ export default function LandingPage({
               Slow down.{" "}
               <span
                 className={
-                  isDark ? "text-[#ADF1DC]" : "text-[#256959]"
+                  isDark
+                    ? "text-[var(--theme-accent,#ADF1DC)]"
+                    : "text-[var(--theme-deep,#256959)]"
                 }
               >
                 Focus deeply.
@@ -170,7 +177,7 @@ export default function LandingPage({
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4">
               <Link
                 to="/app"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-[#ADF1DC] text-[#002019] font-extrabold text-sm shadow-lg shadow-[#ADF1DC]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-[var(--theme-accent,#ADF1DC)] text-[#002019] font-extrabold text-sm shadow-lg shadow-[var(--theme-accent,#ADF1DC)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 <span>Enter as guest</span>
                 <img
@@ -184,8 +191,8 @@ export default function LandingPage({
                 to="/register"
                 className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm border transition-all hover:scale-[1.02] active:scale-[0.98] ${
                   isDark
-                    ? "bg-[#1f2725]/90 border-white/15 text-[#e8f3ec] hover:border-[#ADF1DC]/50 hover:bg-[#26312e]"
-                    : "bg-white border-black/10 text-[#141e19] hover:border-black/20 hover:bg-[#f1fcf4] shadow-xs"
+                    ? "bg-[var(--theme-card-dark,#1f2725)]/90 border-white/15 text-[#e8f3ec] hover:border-[var(--theme-accent,#ADF1DC)]/50"
+                    : "bg-white border-black/10 text-[#141e19] hover:border-black/20 hover:bg-[var(--theme-bg-light,#f1fcf4)] shadow-xs"
                 }`}
               >
                 <img
@@ -239,13 +246,13 @@ export default function LandingPage({
                 transition={{ duration: 0.4, delay: 0.12 * (idx + 1) }}
                 className={`rounded-3xl p-6 border shadow-lg flex flex-col justify-between transition-all hover:-translate-y-1 ${
                   isDark
-                    ? "bg-[#1f2725]/90 border-white/10 hover:border-[#ADF1DC]/30"
-                    : "bg-white border-black/8 hover:border-[#256959]/25 shadow-[#256959]/5"
+                    ? "bg-[var(--theme-card-dark,#1f2725)]/90 border-white/10 hover:border-[var(--theme-accent,#ADF1DC)]/30"
+                    : "bg-white border-black/8 hover:border-[var(--theme-deep,#256959)]/25 shadow-[var(--theme-deep,#256959)]/5"
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-4">
-                    <div className="w-11 h-11 rounded-2xl bg-[#ADF1DC] text-[#002019] flex items-center justify-center p-2.5 shadow-xs">
+                    <div className="w-11 h-11 rounded-2xl bg-[var(--theme-accent,#ADF1DC)] text-[#002019] flex items-center justify-center p-2.5 shadow-xs">
                       <img
                         src={feature.icon}
                         alt=""
@@ -255,8 +262,8 @@ export default function LandingPage({
                     <span
                       className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                         isDark
-                          ? "bg-[#141E19] border-white/10 text-[#ADF1DC]"
-                          : "bg-[#f1fcf4] border-black/5 text-[#256959]"
+                          ? "bg-[var(--theme-bg-dark,#141E19)] border-white/10 text-[var(--theme-accent,#ADF1DC)]"
+                          : "bg-[var(--theme-bg-light,#f1fcf4)] border-black/5 text-[var(--theme-deep,#256959)]"
                       }`}
                     >
                       {feature.badge}
@@ -294,8 +301,8 @@ export default function LandingPage({
       <footer
         className={`w-full border-t py-5 px-4 sm:px-6 text-xs relative z-10 ${
           isDark
-            ? "border-white/5 bg-[#141E19]/90"
-            : "border-black/5 bg-[#FAF9F6]/90"
+            ? "border-white/5 bg-[var(--theme-bg-dark,#141E19)]/90"
+            : "border-black/5 bg-[var(--theme-bg-light,#FAF9F6)]/90"
         }`}
       >
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -325,8 +332,8 @@ export default function LandingPage({
             <span
               className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
                 isDark
-                  ? "bg-[#1f2725] border-white/10 text-[#ADF1DC]"
-                  : "bg-[#ebf6ef] border-black/5 text-[#256959]"
+                  ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 text-[var(--theme-accent,#ADF1DC)]"
+                  : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5 text-[var(--theme-deep,#256959)]"
               }`}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />

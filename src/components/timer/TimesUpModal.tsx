@@ -35,8 +35,8 @@ export default function TimesUpModal({
             onClick={(e) => e.stopPropagation()}
             className={`w-full max-w-sm rounded-3xl p-6 sm:p-8 border shadow-2xl relative text-center flex flex-col items-center transition-colors ${
               isDark
-                ? "bg-[#1f2725] border-white/10 text-[#e8f3ec]"
-                : "bg-white border-black/5 text-[#141e19]"
+                ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 text-[#e8f3ec]"
+                : "bg-[var(--theme-card-light,#ffffff)] border-black/5 text-[#141e19]"
             }`}
           >
             {/* Application Logo */}

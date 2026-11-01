@@ -228,7 +228,7 @@ export default function TimerCard({
   return (
     <section
       className={`w-full h-full rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-between relative overflow-hidden border shadow-sm transition-colors ${
-        isDark ? "bg-[#1f2725] border-white/5" : "bg-white border-black/5"
+        isDark ? "bg-[var(--theme-card-dark,#1f2725)] border-white/5" : "bg-[var(--theme-card-light,#ffffff)] border-black/5"
       }`}
     >
       {/* Mode Tabs + Manual Timer Button with Liquid Sliding Pill Indicator */}

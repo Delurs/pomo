@@ -35,8 +35,8 @@ export default function LogoutConfirmModal({
             onClick={(e) => e.stopPropagation()}
             className={`p-6 rounded-3xl border shadow-2xl max-w-sm w-full text-center transition-colors ${
               isDark
-                ? "bg-[#1f2725] border-white/10 text-[#e8f3ec]"
-                : "bg-white border-black/10 text-[#141e19]"
+                ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 text-[#e8f3ec]"
+                : "bg-[var(--theme-card-light,#ffffff)] border-black/10 text-[#141e19]"
             }`}
           >
             <div className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center bg-red-500/15 text-red-500">

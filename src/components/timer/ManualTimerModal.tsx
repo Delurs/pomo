@@ -66,8 +66,8 @@ export default function ManualTimerModal({
             onClick={(e) => e.stopPropagation()}
             className={`w-full max-w-[440px] rounded-3xl p-6 border shadow-2xl relative ${
               isDark
-                ? "bg-[#1f2725] border-white/10 text-[#e8f3ec]"
-                : "bg-white border-black/5 text-[#141e19]"
+                ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 text-[#e8f3ec]"
+                : "bg-[var(--theme-card-light,#ffffff)] border-black/5 text-[#141e19]"
             }`}
           >
         <div className="flex items-center justify-between pb-3 border-b border-black/5 dark:border-white/5 mb-4">

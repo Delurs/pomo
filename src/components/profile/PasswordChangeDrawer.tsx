@@ -140,9 +140,9 @@ export default function PasswordChangeDrawer({
             placeholder="Current password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            className={`w-full h-9 px-3 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${
+            className={`w-full h-9 px-3 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${
               isDark
-                ? "bg-[#1f2725] border-white/10 placeholder-white/30"
+                ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 placeholder-white/30"
                 : "bg-white border-black/10 placeholder-black/30"
             }`}
           />
@@ -159,9 +159,9 @@ export default function PasswordChangeDrawer({
             placeholder="New password (min. 6)"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className={`w-full h-9 px-3 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${
+            className={`w-full h-9 px-3 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${
               isDark
-                ? "bg-[#1f2725] border-white/10 placeholder-white/30"
+                ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 placeholder-white/30"
                 : "bg-white border-black/10 placeholder-black/30"
             }`}
           />
@@ -178,9 +178,9 @@ export default function PasswordChangeDrawer({
             placeholder="Re-enter new password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className={`w-full h-9 px-3 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[#adf1dc] ${
+            className={`w-full h-9 px-3 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${
               isDark
-                ? "bg-[#1f2725] border-white/10 placeholder-white/30"
+                ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10 placeholder-white/30"
                 : "bg-white border-black/10 placeholder-black/30"
             }`}
           />
@@ -211,7 +211,7 @@ export default function PasswordChangeDrawer({
           <button
             type="submit"
             disabled={isUpdatingPassword}
-            className="px-4 py-1.5 rounded-full bg-[#adf1dc] text-[#002019] text-xs font-bold hover:scale-105 transition cursor-pointer shadow-sm disabled:opacity-60"
+            className="px-4 py-1.5 rounded-full bg-[var(--theme-accent,#adf1dc)] text-[#002019] text-xs font-bold hover:scale-105 transition cursor-pointer shadow-sm disabled:opacity-60"
           >
             {isUpdatingPassword ? "Verifying..." : "Update Password"}
           </button>

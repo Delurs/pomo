@@ -127,13 +127,13 @@ export default function NewTaskModal({
                         animate="visible"
                         exit="exit"
                         onClick={(e) => e.stopPropagation()}
-                        className={`w-full max-w-[520px] max-h-[90vh] overflow-y-auto rounded-3xl p-6 border shadow-2xl relative ${isDark ? "bg-[#1f2725] border-white/10" : "bg-white border-black/5"
+                        className={`w-full max-w-[520px] max-h-[90vh] overflow-y-auto rounded-3xl p-6 border shadow-2xl relative ${isDark ? "bg-[var(--theme-card-dark,#1f2725)] border-white/10" : "bg-[var(--theme-card-light,#ffffff)] border-black/5"
                             }`}
                     >
                 {/* Modal Header */}
                 <div className="flex items-center justify-between pb-4 border-b border-black/5 dark:border-white/5 mb-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#adf1dc] text-[#002019] flex items-center justify-center font-bold">
+                        <div className="w-9 h-9 rounded-full bg-[var(--theme-accent,#adf1dc)] text-[#002019] flex items-center justify-center font-bold">
                             <img src={editingTask ? "/edit_note.png" : "/notes.png"} alt="Task" className="w-5 h-5 object-contain" />
                         </div>
                         <div>
@@ -341,7 +341,7 @@ export default function NewTaskModal({
                                         min={new Date().toISOString().split("T")[0]}
                                         onChange={(e) => setReminderDate(e.target.value)}
                                         className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${isDark
-                                            ? "bg-[#1f2725] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
+                                            ? "bg-[var(--theme-card-dark,#1f2725)] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
                                             : "bg-white border-black/10 text-[#141e19]"
                                             }`}
                                     />
@@ -358,7 +358,7 @@ export default function NewTaskModal({
                                         value={reminderTime}
                                         onChange={(e) => setReminderTime(e.target.value)}
                                         className={`w-full h-8 px-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-[var(--theme-accent,#adf1dc)] ${isDark
-                                            ? "bg-[#1f2725] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
+                                            ? "bg-[var(--theme-card-dark,#1f2725)] border-white/15 text-[#e8f3ec] [color-scheme:dark]"
                                             : "bg-white border-black/10 text-[#141e19]"
                                             }`}
                                     />

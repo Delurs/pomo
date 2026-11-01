@@ -70,8 +70,11 @@ export default function MusicPlayerCard({ isDark, stopMusicSignal = 0 }: MusicPl
 
     return (
         <section
-            className={`w-full flex-1 min-h-0 rounded-2xl p-3 sm:p-3.5 border shadow-sm transition-colors flex flex-col justify-between overflow-hidden ${isDark ? "bg-[#1f2725] border-white/5" : "bg-white border-black/5"
-                }`}
+            className={`w-full flex-1 min-h-0 rounded-2xl p-3 sm:p-3.5 border shadow-sm transition-colors flex flex-col justify-between overflow-hidden ${
+                isDark
+                    ? "bg-[var(--theme-card-dark,#1f2725)] border-white/5"
+                    : "bg-[var(--theme-card-light,#ffffff)] border-black/5"
+            }`}
         >
             {/* Header & Controls Bar */}
             <div className="flex-shrink-0 mb-2">
@@ -107,12 +110,13 @@ export default function MusicPlayerCard({ isDark, stopMusicSignal = 0 }: MusicPl
                                 setSelectedMood(item.id);
                                 setEmbedUrl(item.embedUrl);
                             }}
-                            className={`w-full sm:w-auto px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-center ${selectedMood === item.id
-                                ? "bg-[var(--theme-accent,#adf1dc)] text-[#002019] shadow-sm font-semibold"
-                                : isDark
-                                    ? "bg-[var(--theme-subtle-dark,#161b1a)] text-slate-300 hover:bg-white/10"
-                                    : "bg-[var(--theme-subtle-light,#ebf6ef)] text-[#57615c] hover:bg-[var(--theme-hover-light,#dfeee5)]"
-                                }`}
+                            className={`w-full sm:w-auto px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-center ${
+                                selectedMood === item.id
+                                    ? "bg-[var(--theme-accent,#adf1dc)] text-[#002019] shadow-sm font-semibold"
+                                    : isDark
+                                      ? "bg-[var(--theme-subtle-dark,#161b1a)] text-slate-300 hover:bg-white/10"
+                                      : "bg-[var(--theme-subtle-light,#ebf6ef)] text-[#57615c] hover:bg-[var(--theme-hover-light,#dfeee5)]"
+                            }`}
                         >
                             <img src={item.iconSrc} alt={item.label} className="w-3.5 h-3.5 object-contain flex-shrink-0" />
                             <span>{item.label}</span>
@@ -128,10 +132,11 @@ export default function MusicPlayerCard({ isDark, stopMusicSignal = 0 }: MusicPl
                         placeholder="Paste YouTube or Spotify Link..."
                         value={musicInputUrl}
                         onChange={(e) => setMusicInputUrl(e.target.value)}
-                        className={`w-full h-7 sm:h-7.5 pl-8 sm:pl-8.5 pr-14 sm:pr-15 rounded-full text-[10.5px] border focus:outline-none focus:ring-1 focus:ring-[var(--theme-accent,#adf1dc)] transition ${isDark
-                            ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5 placeholder-white/30"
-                            : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5 placeholder-black/40"
-                            }`}
+                        className={`w-full h-7 sm:h-7.5 pl-8 sm:pl-8.5 pr-14 sm:pr-15 rounded-full text-[10.5px] border focus:outline-none focus:ring-1 focus:ring-[var(--theme-accent,#adf1dc)] transition ${
+                            isDark
+                                ? "bg-[var(--theme-subtle-dark,#161b1a)] border-white/5 placeholder-white/30"
+                                : "bg-[var(--theme-subtle-light,#ebf6ef)] border-black/5 placeholder-black/40"
+                        }`}
                     />
                     <motion.button
                         type="submit"
@@ -173,8 +178,9 @@ export default function MusicPlayerCard({ isDark, stopMusicSignal = 0 }: MusicPl
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className={`flex-1 min-h-0 w-full flex items-center justify-center rounded-xl p-3 text-center border border-dashed ${isDark ? "border-white/10" : "border-black/10"
-                            }`}
+                        className={`flex-1 min-h-0 w-full flex items-center justify-center rounded-xl p-3 text-center border border-dashed ${
+                            isDark ? "border-white/10" : "border-black/10"
+                        }`}
                     >
                         <p className="text-[10px] opacity-50">
                             No audio loaded. Select a mood preset above or paste a YouTube / Spotify link.

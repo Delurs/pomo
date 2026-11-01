@@ -88,7 +88,7 @@ export default function CategoryPieChart({
   return (
     <div
       className={`p-4 rounded-2xl border flex flex-col justify-between ${
-        isDark ? "bg-[#1f2725] border-white/5" : "bg-white border-black/5 shadow-2xs"
+        isDark ? "bg-[var(--theme-card-dark,#1f2725)] border-white/5" : "bg-white border-black/5 shadow-2xs"
       }`}
     >
       <div className="flex items-center justify-between mb-2">

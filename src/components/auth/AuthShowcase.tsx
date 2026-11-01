@@ -7,31 +7,32 @@ interface AuthShowcaseProps {
 export default function AuthShowcase({ isDark }: AuthShowcaseProps) {
   const pillBaseClass = `backdrop-blur-md border rounded-2xl px-3.5 py-2.5 shadow-lg flex items-center gap-2.5 select-none pointer-events-none ${
     isDark
-      ? "bg-[#1f2725]/85 border-white/10 text-[#e8f3ec] shadow-black/30"
-      : "bg-white/85 border-white/60 text-[#141e19] shadow-[#256959]/10"
+      ? "bg-[var(--theme-card-dark,#1f2725)]/85 border-white/10 text-[#e8f3ec] shadow-black/30"
+      : "bg-white/85 border-white/60 text-[#141e19] shadow-[var(--theme-deep,#256959)]/10"
   }`;
 
   return (
     <section
-      className={`hidden lg:flex lg:w-1/2 h-screen relative items-center justify-center overflow-hidden select-none ${
-        isDark
-          ? "bg-gradient-to-br from-[#1a2a24] via-[#15221d] to-[#0e1713]"
-          : "bg-gradient-to-br from-[#e3faee] via-[#c8f3df] to-[#adf1dc]"
-      }`}
+      style={{
+        backgroundColor: isDark
+          ? "var(--theme-subtle-dark, #161b1a)"
+          : "var(--theme-active-light, #e5f8ee)",
+      }}
+      className="hidden lg:flex lg:w-1/2 h-screen relative items-center justify-center overflow-hidden select-none transition-colors duration-300"
     >
       {/* Ambient Radial Glows */}
-      <div className="absolute -top-28 -left-28 w-96 h-96 rounded-full bg-[#adf1dc]/40 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-[#256959]/25 blur-3xl pointer-events-none" />
+      <div className="absolute -top-28 -left-28 w-96 h-96 rounded-full bg-[var(--theme-accent,#adf1dc)]/35 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-[var(--theme-deep,#256959)]/25 blur-3xl pointer-events-none" />
 
       {/* Concentric Sanctuary Aura Rings */}
       <div
         className={`absolute w-[26rem] h-[26rem] xl:w-[30rem] xl:h-[30rem] rounded-full border pointer-events-none ${
-          isDark ? "border-white/5" : "border-[#256959]/10"
+          isDark ? "border-white/5" : "border-[var(--theme-deep,#256959)]/10"
         }`}
       />
       <div
         className={`absolute w-[36rem] h-[36rem] xl:w-[40rem] xl:h-[40rem] rounded-full border border-dashed pointer-events-none ${
-          isDark ? "border-white/5" : "border-[#256959]/10"
+          isDark ? "border-white/5" : "border-[var(--theme-deep,#256959)]/10"
         }`}
       />
 
@@ -45,7 +46,7 @@ export default function AuthShowcase({ isDark }: AuthShowcaseProps) {
         }}
         className={`${pillBaseClass} absolute top-[14%] left-[8%] xl:left-[11%] z-20`}
       >
-        <div className="w-8 h-8 rounded-xl bg-[#ADF1DC] flex items-center justify-center p-1.5 flex-shrink-0 shadow-xs">
+        <div className="w-8 h-8 rounded-xl bg-[var(--theme-accent,#adf1dc)] flex items-center justify-center p-1.5 flex-shrink-0 shadow-xs">
           <img src="/Timer.png" alt="" className="w-full h-full object-contain" />
         </div>
         <div className="text-left">
@@ -64,7 +65,7 @@ export default function AuthShowcase({ isDark }: AuthShowcaseProps) {
         }}
         className={`${pillBaseClass} absolute top-[18%] right-[7%] xl:right-[10%] z-20`}
       >
-        <div className="w-8 h-8 rounded-xl bg-[#ADF1DC] flex items-center justify-center p-1.5 flex-shrink-0 shadow-xs">
+        <div className="w-8 h-8 rounded-xl bg-[var(--theme-accent,#adf1dc)] flex items-center justify-center p-1.5 flex-shrink-0 shadow-xs">
           <img src="/headphones.png" alt="" className="w-full h-full object-contain" />
         </div>
         <div className="text-left">
@@ -83,7 +84,7 @@ export default function AuthShowcase({ isDark }: AuthShowcaseProps) {
         }}
         className={`${pillBaseClass} absolute bottom-[16%] left-[9%] xl:left-[12%] z-20`}
       >
-        <div className="w-8 h-8 rounded-xl bg-[#ADF1DC] flex items-center justify-center p-1.5 flex-shrink-0 shadow-xs">
+        <div className="w-8 h-8 rounded-xl bg-[var(--theme-accent,#adf1dc)] flex items-center justify-center p-1.5 flex-shrink-0 shadow-xs">
           <img src="/leaves.png" alt="" className="w-full h-full object-contain" />
         </div>
         <div className="text-left">
@@ -102,7 +103,7 @@ export default function AuthShowcase({ isDark }: AuthShowcaseProps) {
         }}
         className={`${pillBaseClass} absolute bottom-[14%] right-[8%] xl:right-[11%] z-20`}
       >
-        <div className="w-8 h-8 rounded-xl bg-[#ADF1DC] flex items-center justify-center p-1.5 flex-shrink-0 shadow-xs">
+        <div className="w-8 h-8 rounded-xl bg-[var(--theme-accent,#adf1dc)] flex items-center justify-center p-1.5 flex-shrink-0 shadow-xs">
           <img src="/pie_chart.png" alt="" className="w-full h-full object-contain" />
         </div>
         <div className="text-left">
@@ -129,7 +130,9 @@ export default function AuthShowcase({ isDark }: AuthShowcaseProps) {
         />
         <p
           className={`mt-2.5 text-xs xl:text-sm font-semibold tracking-wide max-w-xs ${
-            isDark ? "text-[#adf1dc]/85" : "text-[#1d5649]"
+            isDark
+              ? "text-[var(--theme-accent,#adf1dc)]/85"
+              : "text-[var(--theme-deep,#256959)]"
           }`}
         >
           Calm audio for deep study and mindful breaks.
