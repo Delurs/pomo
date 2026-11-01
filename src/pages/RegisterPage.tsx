@@ -113,8 +113,6 @@ export default function RegisterPage({
   };
 
   const handleGuestMode = () => {
-    localStorage.setItem("pomo_user_name", "Mindful Guest");
-    localStorage.setItem("pomo_user_id", "guest");
     onLogin("Mindful Guest", "guest");
     navigate("/app");
   };

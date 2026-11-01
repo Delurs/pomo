@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router";
 import { supabase } from "./lib/supabaseClient";
 import type { Task } from "./types/pomo";
 import Header from "./components/Header";
@@ -16,16 +23,19 @@ import { type ThemeColor, THEME_COLORS } from "./types/themeColors";
 
 function AppRoutes() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    return localStorage.getItem("pomo_dark_mode") === "true";
-  });
-  const [colorTheme, setColorTheme] = useState<ThemeColor>(() => {
-    return (localStorage.getItem("pomo_theme_color") as ThemeColor) || "green";
-  });
+  const [isDark, setIsDark] = useState<boolean>(false);
+  const [colorTheme, setColorTheme] = useState<ThemeColor>("green");
+
+  // Clear any legacy persisted theme/guest keys on mount
+  useEffect(() => {
+    localStorage.removeItem("pomo_theme_color");
+    localStorage.removeItem("pomo_dark_mode");
+    localStorage.removeItem("pomo_guest_tasks");
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem("pomo_dark_mode", String(isDark));
     if (isDark) {
       document.documentElement.classList.add("dark");
     } else {
@@ -34,7 +44,6 @@ function AppRoutes() {
   }, [isDark]);
 
   useEffect(() => {
-    localStorage.setItem("pomo_theme_color", colorTheme);
     const theme = THEME_COLORS[colorTheme] || THEME_COLORS.green;
     const root = document.documentElement;
     root.style.setProperty("--theme-accent", theme.accent);
@@ -53,12 +62,8 @@ function AppRoutes() {
 
   // AUTH STATE
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [userId, setUserId] = useState<string | null>(() => {
-    return localStorage.getItem("pomo_user_id") || "guest";
-  });
-  const [_userName, setUserName] = useState<string>(() => {
-    return localStorage.getItem("pomo_user_name") || "Mindful Guest";
-  });
+  const [userId, setUserId] = useState<string | null>("guest");
+  const [_userName, setUserName] = useState<string>("Mindful Guest");
   const [isPasswordRecovery, setIsPasswordRecovery] = useState<boolean>(() => {
     return (
       window.location.hash.includes("type=recovery") ||
@@ -80,6 +85,20 @@ function AppRoutes() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
 
+  // Reset theme to default green and clear guest tasks when exiting /app
+  useEffect(() => {
+    if (location.pathname !== "/app") {
+      setColorTheme("green");
+      setIsDark(false);
+      if (!isAuthenticated || userId === "guest") {
+        setTasks([]);
+        setActiveTaskId(null);
+        setTaskCompletedSessions(0);
+        setTotalSessions(0);
+      }
+    }
+  }, [location.pathname, isAuthenticated, userId]);
+
   // 1. SUPABASE SESSION LISTENER
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -93,8 +112,7 @@ function AppRoutes() {
       } else {
         setIsAuthenticated(false);
         setUserId("guest");
-        const name = localStorage.getItem("pomo_user_name") || "Mindful Guest";
-        setUserName(name);
+        setUserName("Mindful Guest");
       }
     });
 
@@ -114,6 +132,8 @@ function AppRoutes() {
       } else {
         setIsAuthenticated(false);
         setUserId("guest");
+        setUserName("Mindful Guest");
+        setTasks([]);
       }
     });
 
@@ -123,16 +143,7 @@ function AppRoutes() {
   // 2. FETCH TASKS ON LOGIN / USER CHANGE
   const fetchTasks = useCallback(async (uid: string) => {
     if (!uid || uid === "guest") {
-      const saved = localStorage.getItem("pomo_guest_tasks");
-      if (saved) {
-        try {
-          setTasks(JSON.parse(saved));
-        } catch {
-          setTasks([]);
-        }
-      } else {
-        setTasks([]);
-      }
+      setTasks([]);
       return;
     }
 
@@ -173,9 +184,16 @@ function AppRoutes() {
   const handleLogin = (name: string, id: string) => {
     setUserName(name);
     setUserId(id);
-    localStorage.setItem("pomo_user_name", name);
-    localStorage.setItem("pomo_user_id", id);
-    setIsAuthenticated(id !== "guest");
+    if (id === "guest") {
+      localStorage.removeItem("pomo_user_name");
+      localStorage.removeItem("pomo_user_id");
+      setTasks([]);
+      setIsAuthenticated(false);
+    } else {
+      localStorage.setItem("pomo_user_name", name);
+      localStorage.setItem("pomo_user_id", id);
+      setIsAuthenticated(true);
+    }
   };
 
   const handleLogout = async () => {
@@ -184,15 +202,25 @@ function AppRoutes() {
     }
     localStorage.removeItem("pomo_is_logged_in");
     sessionStorage.removeItem("pomo_is_logged_in");
-    localStorage.setItem("pomo_user_id", "guest");
-    localStorage.setItem("pomo_user_name", "Mindful Guest");
+    localStorage.removeItem("pomo_user_id");
+    localStorage.removeItem("pomo_user_name");
+    localStorage.removeItem("pomo_guest_tasks");
+    localStorage.removeItem("pomo_theme_color");
+    localStorage.removeItem("pomo_dark_mode");
+    setColorTheme("green");
+    setIsDark(false);
     setIsAuthenticated(false);
     setUserId("guest");
+    setUserName("Mindful Guest");
+    setTasks([]);
+    setActiveTaskId(null);
+    setTaskCompletedSessions(0);
+    setTotalSessions(0);
     setIsProfileOpen(false);
     navigate("/login");
   };
 
-  // 3. TASK HANDLERS WITH SUPABASE PERSISTENCE
+  // 3. TASK HANDLERS WITH SUPABASE PERSISTENCE (Authenticated Users Only)
   const handleOpenTaskModal = (initialTitle: string = "") => {
     setEditingTask(null);
     setModalInitialTitle(initialTitle);
@@ -225,11 +253,6 @@ function AppRoutes() {
       if (error) {
         console.error("SUPABASE TASK INSERT FAILED:", error.message);
       }
-    } else {
-      localStorage.setItem(
-        "pomo_guest_tasks",
-        JSON.stringify([newTask, ...tasks])
-      );
     }
   };
 
@@ -273,13 +296,6 @@ function AppRoutes() {
         .eq("user_id", userId);
 
       if (error) console.error("SUPABASE TASK UPDATE FAILED:", error.message);
-    } else {
-      localStorage.setItem(
-        "pomo_guest_tasks",
-        JSON.stringify(
-          tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
-        )
-      );
     }
   };
 
@@ -326,15 +342,6 @@ function AppRoutes() {
       if (error) {
         console.error("SUPABASE TOGGLE COMPLETION FAILED:", error.message);
       }
-    } else {
-      localStorage.setItem(
-        "pomo_guest_tasks",
-        JSON.stringify(
-          tasks.map((t) =>
-            t.id === taskId ? { ...t, completed: newCompleted } : t
-          )
-        )
-      );
     }
   };
 
@@ -380,11 +387,6 @@ function AppRoutes() {
         .eq("user_id", userId);
 
       if (error) console.error("SUPABASE TASK DELETE FAILED:", error.message);
-    } else {
-      localStorage.setItem(
-        "pomo_guest_tasks",
-        JSON.stringify(tasks.filter((t) => t.id !== taskId))
-      );
     }
   };
 
