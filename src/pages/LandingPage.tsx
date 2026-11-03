@@ -10,42 +10,18 @@ export interface LandingPageProps {
 const FEATURES = [
   {
     id: "timer",
-    badge: "Timed work and breaks.",
-    icon: "/Timer.png",
     title: "Simple Focus Timer",
-    description:
-      "Stay on track with 25-minute focus sessions, custom timers, and gentle alarm chimes.",
-    highlights: [
-      "Visual countdown ring with quick +15s or -15s adjustments",
-      "Set your own custom hours, minutes, and seconds",
-      "Gentle chime that rings clearly when your timer ends",
-    ],
+    image: "/simple-focus-timer.jpg",
   },
   {
     id: "tasks",
-    badge: "Mindful Milestones",
-    icon: "/leaves.png",
     title: "Step-by-Step Tasks",
-    description:
-      "Break big goals into small, manageable steps and organize your day without stress.",
-    highlights: [
-      "Break any task into smaller, easy-to-finish checklists",
-      "Organize your pace by Priority, Gentle Flow, or Someday",
-      "Automatically saves and syncs across all your devices",
-    ],
+    image: "/step-by-step.jpg",
   },
   {
     id: "media",
-    badge: "Lo-Fi • Spotify • YouTube",
-    icon: "/headphones.png",
     title: "Calming Study Music",
-    description:
-      "Listen to soothing background sounds or your favorite Spotify and YouTube playlists.",
-    highlights: [
-      "Built-in rain, cozy cafe, soft piano, and forest sounds",
-      "Play your own YouTube or Spotify playlists right in the app",
-      "Music automatically pauses when your focus session finishes",
-    ],
+    image: "/calming-study-music.jpg",
   },
 ];
 
@@ -239,59 +215,23 @@ export default function LandingPage({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {FEATURES.map((feature, idx) => (
-              <motion.article
+              <motion.div
                 key={feature.id}
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.12 * (idx + 1) }}
-                className={`rounded-3xl p-6 border shadow-lg flex flex-col justify-between transition-all hover:-translate-y-1 ${
+                className={`rounded-3xl overflow-hidden border shadow-lg transition-all hover:-translate-y-1 ${
                   isDark
-                    ? "bg-[var(--theme-card-dark,#1f2725)]/90 border-white/10 hover:border-[var(--theme-accent,#ADF1DC)]/30"
-                    : "bg-white border-black/8 hover:border-[var(--theme-deep,#256959)]/25 shadow-[var(--theme-deep,#256959)]/5"
+                    ? "border-white/10 hover:border-[var(--theme-accent,#ADF1DC)]/30"
+                    : "border-black/8 hover:border-[var(--theme-deep,#256959)]/25 shadow-[var(--theme-deep,#256959)]/5"
                 }`}
               >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <div className="w-11 h-11 rounded-2xl bg-[var(--theme-accent,#ADF1DC)] text-[#002019] flex items-center justify-center p-2.5 shadow-xs">
-                      <img
-                        src={feature.icon}
-                        alt=""
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                        isDark
-                          ? "bg-[var(--theme-bg-dark,#141E19)] border-white/10 text-[var(--theme-accent,#ADF1DC)]"
-                          : "bg-[var(--theme-bg-light,#f1fcf4)] border-black/5 text-[var(--theme-deep,#256959)]"
-                      }`}
-                    >
-                      {feature.badge}
-                    </span>
-                  </div>
-
-                  <h3 className="text-base sm:text-lg font-extrabold tracking-tight mb-2">
-                    {feature.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-[13px] opacity-75 leading-relaxed mb-4">
-                    {feature.description}
-                  </p>
-                </div>
-
-                <ul className="space-y-2 pt-3 border-t border-black/5 dark:border-white/5 text-[11px] sm:text-xs opacity-75">
-                  {feature.highlights.map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <img
-                        src="/check_circle.png"
-                        alt=""
-                        className="w-3.5 h-3.5 object-contain mt-0.5 flex-shrink-0"
-                      />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.article>
+                <img
+                  src={feature.image}
+                  alt={feature.title}
+                  className="w-full h-auto object-cover block"
+                />
+              </motion.div>
             ))}
           </div>
         </section>
