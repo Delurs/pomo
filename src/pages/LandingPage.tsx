@@ -41,8 +41,8 @@ export default function LandingPage({
       }`}
     >
       {/* Ambient Background Glows */}
-      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[48rem] h-[28rem] rounded-full bg-[var(--theme-accent,#ADF1DC)]/25 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 -right-40 w-[30rem] h-[30rem] rounded-full bg-[var(--theme-deep,#256959)]/15 blur-3xl" />
+      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[48rem] h-[28rem] rounded-full bg-[#4ade80]/40 dark:bg-[#4ade80]/30 blur-3xl animate-orb-breathe" />
+      <div className="pointer-events-none absolute top-1/3 -right-40 w-[30rem] h-[30rem] rounded-full bg-[#3eb489]/35 dark:bg-[var(--theme-deep,#256959)]/45 blur-3xl animate-orb-breathe-alt" />
 
       {/* Top Navigation Bar */}
       <header

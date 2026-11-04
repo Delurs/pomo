@@ -60,3 +60,35 @@
 .animate-fade-in {
   animation: fadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+@keyframes orbBreathePrimary {
+  0%, 100% {
+    transform: scale(0.75);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+}
+
+@keyframes orbBreatheSecondary {
+  0%, 100% {
+    transform: scale(1.25);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(0.75);
+    opacity: 0.5;
+  }
+}
+
+.animate-orb-breathe {
+  animation: orbBreathePrimary 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-orb-breathe-alt {
+  animation: orbBreatheSecondary 9s ease-in-out infinite;
+  will-change: transform, opacity;
+}
